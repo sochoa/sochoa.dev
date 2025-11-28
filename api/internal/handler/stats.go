@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"encoding/json"
 	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/sochoa/sochoa.dev/api/internal/middleware"
+	"github.com/sochoa/sochoa.dev/api/internal/auth"
 	"github.com/sochoa/sochoa.dev/api/internal/model"
 	"github.com/sochoa/sochoa.dev/api/internal/view"
 )
@@ -39,18 +39,18 @@ type RecordStatsRequest struct {
 }
 
 // RecordStats handles POST /api/stats (internal metrics intake, requires signed header)
-func (h *StatsHandler) RecordStats(w http.ResponseWriter, r *http.Request) {
+func (h *StatsHandler) RecordStats(c *gin.Context) {
 	// In production, this would validate a signed key header from CloudWatch or metrics service
 	// For now, we'll accept any request if admin is authenticated
-	user := middleware.UserFromContext(r)
+	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
-		writeJSONError(w, http.StatusForbidden, "access denied")
+		c.JSON(http.StatusForbidden, gin.H{"error": "access denied"})
 		return
 	}
 
 	var req RecordStatsRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeJSONError(w, http.StatusBadRequest, "invalid request body")
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
@@ -68,112 +68,107 @@ func (h *StatsHandler) RecordStats(w http.ResponseWriter, r *http.Request) {
 		Errors5xx:      req.Errors5xx,
 	}
 
-	if err := h.statsRepo.Create(r.Context(), stat); err != nil {
+	if err := h.statsRepo.Create(c, stat); err != nil {
 		status, message := statusCodeFromError(err)
-		writeJSONError(w, status, message)
+		c.JSON(status, gin.H{"error": message})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(view.ToVisitorStatResponse(stat))
+	c.JSON(http.StatusCreated, view.ToVisitorStatResponse(stat))
 }
 
 // GetStats handles GET /api/stats/:id (admin only)
-func (h *StatsHandler) GetStats(w http.ResponseWriter, r *http.Request) {
-	user := middleware.UserFromContext(r)
+func (h *StatsHandler) GetStats(c *gin.Context) {
+	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
-		writeJSONError(w, http.StatusForbidden, "admin role required")
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin role required"})
 		return
 	}
 
-	idStr := r.PathValue("id")
+	idStr := c.Param("id")
 	if idStr == "" {
-		writeJSONError(w, http.StatusBadRequest, "id is required")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
 		return
 	}
 
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "invalid id format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id format"})
 		return
 	}
 
-	stat, err := h.statsRepo.GetByID(r.Context(), id)
+	stat, err := h.statsRepo.GetByID(c, id)
 	if err != nil {
 		status, message := statusCodeFromError(err)
-		writeJSONError(w, status, message)
+		c.JSON(status, gin.H{"error": message})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(view.ToVisitorStatResponse(stat))
+	c.JSON(http.StatusOK, view.ToVisitorStatResponse(stat))
 }
 
 // ListStatsByDateRange handles GET /api/stats (admin only)
-func (h *StatsHandler) ListStatsByDateRange(w http.ResponseWriter, r *http.Request) {
-	user := middleware.UserFromContext(r)
+func (h *StatsHandler) ListStatsByDateRange(c *gin.Context) {
+	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
-		writeJSONError(w, http.StatusForbidden, "admin role required")
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin role required"})
 		return
 	}
 
-	startDateStr := r.URL.Query().Get("start_date")
-	endDateStr := r.URL.Query().Get("end_date")
+	startDateStr := c.Query("start_date")
+	endDateStr := c.Query("end_date")
 
 	if startDateStr == "" || endDateStr == "" {
-		writeJSONError(w, http.StatusBadRequest, "start_date and end_date are required")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "start_date and end_date are required"})
 		return
 	}
 
 	startDate, err := time.Parse("2006-01-02", startDateStr)
 	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "invalid start_date format (use YYYY-MM-DD)")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid start_date format (use YYYY-MM-DD)"})
 		return
 	}
 
 	endDate, err := time.Parse("2006-01-02", endDateStr)
 	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "invalid end_date format (use YYYY-MM-DD)")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid end_date format (use YYYY-MM-DD)"})
 		return
 	}
 
-	limit, offset := parsePagination(r)
+	limit, offset := parsePaginationGin(c)
 
-	stats, err := h.statsRepo.ListByDateRange(r.Context(), startDate, endDate, limit, offset)
+	stats, err := h.statsRepo.ListByDateRange(c, startDate, endDate, limit, offset)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "failed to list stats")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to list stats"})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(view.ToVisitorStatResponses(stats))
+	c.JSON(http.StatusOK, view.ToVisitorStatResponses(stats))
 }
 
 // ListStatsByPage handles GET /api/stats/page/:page_path (admin only)
-func (h *StatsHandler) ListStatsByPage(w http.ResponseWriter, r *http.Request) {
-	user := middleware.UserFromContext(r)
+func (h *StatsHandler) ListStatsByPage(c *gin.Context) {
+	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
-		writeJSONError(w, http.StatusForbidden, "admin role required")
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin role required"})
 		return
 	}
 
-	pagePath := r.PathValue("page_path")
+	pagePath := c.Param("page_path")
 	if pagePath == "" {
-		writeJSONError(w, http.StatusBadRequest, "page_path is required")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "page_path is required"})
 		return
 	}
 
-	limit, offset := parsePagination(r)
+	limit, offset := parsePaginationGin(c)
 
-	stats, err := h.statsRepo.ListByPage(r.Context(), pagePath, limit, offset)
+	stats, err := h.statsRepo.ListByPage(c, pagePath, limit, offset)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "failed to list stats")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to list stats"})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(view.ToVisitorStatResponses(stats))
+	c.JSON(http.StatusOK, view.ToVisitorStatResponses(stats))
 }
 
 // UpdateStatsRequest represents the request body for updating stats
@@ -188,35 +183,35 @@ type UpdateStatsRequest struct {
 }
 
 // UpdateStats handles PUT /api/stats/:id (admin only)
-func (h *StatsHandler) UpdateStats(w http.ResponseWriter, r *http.Request) {
-	user := middleware.UserFromContext(r)
+func (h *StatsHandler) UpdateStats(c *gin.Context) {
+	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
-		writeJSONError(w, http.StatusForbidden, "admin role required")
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin role required"})
 		return
 	}
 
-	idStr := r.PathValue("id")
+	idStr := c.Param("id")
 	if idStr == "" {
-		writeJSONError(w, http.StatusBadRequest, "id is required")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
 		return
 	}
 
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "invalid id format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id format"})
 		return
 	}
 
-	stat, err := h.statsRepo.GetByID(r.Context(), id)
+	stat, err := h.statsRepo.GetByID(c, id)
 	if err != nil {
 		status, message := statusCodeFromError(err)
-		writeJSONError(w, status, message)
+		c.JSON(status, gin.H{"error": message})
 		return
 	}
 
 	var req UpdateStatsRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeJSONError(w, http.StatusBadRequest, "invalid request body")
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
@@ -228,12 +223,11 @@ func (h *StatsHandler) UpdateStats(w http.ResponseWriter, r *http.Request) {
 	stat.Errors4xx = req.Errors4xx
 	stat.Errors5xx = req.Errors5xx
 
-	if err := h.statsRepo.Update(r.Context(), stat); err != nil {
+	if err := h.statsRepo.Update(c, stat); err != nil {
 		status, message := statusCodeFromError(err)
-		writeJSONError(w, status, message)
+		c.JSON(status, gin.H{"error": message})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(view.ToVisitorStatResponse(stat))
+	c.JSON(http.StatusOK, view.ToVisitorStatResponse(stat))
 }

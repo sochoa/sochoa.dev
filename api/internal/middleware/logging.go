@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/sochoa/sochoa.dev/api/internal/logger" // nosec
 )
@@ -74,4 +75,41 @@ func (rw *responseWriter) Write(b []byte) (int, error) {
 	size, err := rw.ResponseWriter.Write(b)
 	rw.size += size
 	return size, err
+}
+
+// RequestLoggerGin returns a Gin middleware that logs HTTP requests with request IDs
+func RequestLoggerGin(log *slog.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Generate request ID
+		requestID := uuid.New().String()
+
+		// Inject request ID into context
+		ctx := logger.WithRequestID(c.Request.Context(), requestID)
+		c.Request = c.Request.WithContext(ctx)
+
+		// Record start time
+		start := time.Now()
+
+		// Log request
+		log.Info("request received",
+			slog.String("request_id", requestID),
+			slog.String("method", c.Request.Method),
+			slog.String("path", c.Request.RequestURI),
+			slog.String("remote_addr", c.Request.RemoteAddr),
+		)
+
+		// Call next handler
+		c.Next()
+
+		// Log response
+		duration := time.Since(start)
+		log.Info("request completed",
+			slog.String("request_id", requestID),
+			slog.String("method", c.Request.Method),
+			slog.String("path", c.Request.RequestURI),
+			slog.Int("status", c.Writer.Status()),
+			slog.Int("size", c.Writer.Size()),
+			slog.Duration("latency", duration),
+		)
+	}
 }

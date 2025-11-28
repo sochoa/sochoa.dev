@@ -1,14 +1,11 @@
 package handler
 
 import (
-	"encoding/json"
-	"errors"
 	"net/http"
-	"strconv"
 
+	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	apierrors "github.com/sochoa/sochoa.dev/api/internal/errors"
-	"github.com/sochoa/sochoa.dev/api/internal/middleware"
+	"github.com/sochoa/sochoa.dev/api/internal/auth"
 	"github.com/sochoa/sochoa.dev/api/internal/model"
 	"github.com/sochoa/sochoa.dev/api/internal/view"
 )
@@ -27,25 +24,25 @@ func NewPostHandler(postRepo *model.PostRepository) *PostHandler {
 
 // CreatePostRequest represents the request body for creating a post
 type CreatePostRequest struct {
-	Slug      string   `json:"slug"`
-	Title     string   `json:"title"`
+	Slug      string   `json:"slug" binding:"required"`
+	Title     string   `json:"title" binding:"required"`
 	Summary   string   `json:"summary"`
-	Body      string   `json:"body"`
+	Body      string   `json:"body" binding:"required"`
 	Tags      []string `json:"tags"`
-	Status    string   `json:"status"`
+	Status    string   `json:"status" binding:"required"`
 }
 
 // CreatePost handles POST /api/posts (admin only)
-func (h *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
-	user := middleware.UserFromContext(r)
-	if user == nil || !user.IsAdmin() {
-		writeJSONError(w, http.StatusForbidden, "admin role required")
+func (h *PostHandler) CreatePost(c *gin.Context) {
+	user := c.MustGet("user").(*auth.User)
+	if !user.IsAdmin() {
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin role required"})
 		return
 	}
 
 	var req CreatePostRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeJSONError(w, http.StatusBadRequest, "invalid request body")
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
@@ -58,100 +55,96 @@ func (h *PostHandler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		Status:  model.PostStatus(req.Status),
 	}
 
-	if err := h.postRepo.Create(r.Context(), post); err != nil {
+	if err := h.postRepo.Create(c, post); err != nil {
 		status, message := statusCodeFromError(err)
-		writeJSONError(w, status, message)
+		c.JSON(status, gin.H{"error": message})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(view.ToPostResponse(post))
+	c.JSON(http.StatusCreated, view.ToPostResponse(post))
 }
 
 // GetPost handles GET /api/posts/:slug (public)
-func (h *PostHandler) GetPost(w http.ResponseWriter, r *http.Request) {
-	slug := r.PathValue("slug")
+func (h *PostHandler) GetPost(c *gin.Context) {
+	slug := c.Param("slug")
 	if slug == "" {
-		writeJSONError(w, http.StatusBadRequest, "slug is required")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "slug is required"})
 		return
 	}
 
-	post, err := h.postRepo.GetBySlug(r.Context(), slug)
+	post, err := h.postRepo.GetBySlug(c, slug)
 	if err != nil {
 		status, message := statusCodeFromError(err)
-		writeJSONError(w, status, message)
+		c.JSON(status, gin.H{"error": message})
 		return
 	}
 
 	// For public access, only show published posts
 	if post.Status != model.PostStatusPublished {
-		user := middleware.UserFromContext(r)
-		if user == nil || !user.IsAdmin() {
-			writeJSONError(w, http.StatusNotFound, "post not found")
+		user, exists := c.Get("user")
+		if !exists || user.(*auth.User) == nil || !user.(*auth.User).IsAdmin() {
+			c.JSON(http.StatusNotFound, gin.H{"error": "post not found"})
 			return
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(view.ToPostResponse(post))
+	c.JSON(http.StatusOK, view.ToPostResponse(post))
 }
 
 // ListPublishedPosts handles GET /api/posts (public)
-func (h *PostHandler) ListPublishedPosts(w http.ResponseWriter, r *http.Request) {
-	limit, offset := parsePagination(r)
-	tag := r.URL.Query().Get("tag")
+func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
+	limit, offset := parsePaginationGin(c)
+	tag := c.Query("tag")
 
-	posts, err := h.postRepo.ListPublished(r.Context(), limit, offset, tag)
+	posts, err := h.postRepo.ListPublished(c, limit, offset, tag)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "failed to list posts")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to list posts"})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(view.ToPostResponses(posts))
+	c.JSON(http.StatusOK, view.ToPostResponses(posts))
 }
 
 // UpdatePostRequest represents the request body for updating a post
 type UpdatePostRequest struct {
-	Slug      string   `json:"slug"`
-	Title     string   `json:"title"`
+	Slug      string   `json:"slug" binding:"required"`
+	Title     string   `json:"title" binding:"required"`
 	Summary   string   `json:"summary"`
-	Body      string   `json:"body"`
+	Body      string   `json:"body" binding:"required"`
 	Tags      []string `json:"tags"`
-	Status    string   `json:"status"`
+	Status    string   `json:"status" binding:"required"`
 }
 
 // UpdatePost handles PUT /api/posts/:id (admin only)
-func (h *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
-	user := middleware.UserFromContext(r)
-	if user == nil || !user.IsAdmin() {
-		writeJSONError(w, http.StatusForbidden, "admin role required")
+func (h *PostHandler) UpdatePost(c *gin.Context) {
+	user := c.MustGet("user").(*auth.User)
+	if !user.IsAdmin() {
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin role required"})
 		return
 	}
 
-	idStr := r.PathValue("id")
+	idStr := c.Param("id")
 	if idStr == "" {
-		writeJSONError(w, http.StatusBadRequest, "id is required")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
 		return
 	}
 
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "invalid id format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id format"})
 		return
 	}
 
 	var req UpdatePostRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeJSONError(w, http.StatusBadRequest, "invalid request body")
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
-	post, err := h.postRepo.GetByID(r.Context(), id)
+	post, err := h.postRepo.GetByID(c, id)
 	if err != nil {
 		status, message := statusCodeFromError(err)
-		writeJSONError(w, status, message)
+		c.JSON(status, gin.H{"error": message})
 		return
 	}
 
@@ -162,90 +155,40 @@ func (h *PostHandler) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	post.Tags = req.Tags
 	post.Status = model.PostStatus(req.Status)
 
-	if err := h.postRepo.Update(r.Context(), post); err != nil {
+	if err := h.postRepo.Update(c, post); err != nil {
 		status, message := statusCodeFromError(err)
-		writeJSONError(w, status, message)
+		c.JSON(status, gin.H{"error": message})
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(view.ToPostResponse(post))
+	c.JSON(http.StatusOK, view.ToPostResponse(post))
 }
 
 // DeletePost handles DELETE /api/posts/:id (admin only)
-func (h *PostHandler) DeletePost(w http.ResponseWriter, r *http.Request) {
-	user := middleware.UserFromContext(r)
-	if user == nil || !user.IsAdmin() {
-		writeJSONError(w, http.StatusForbidden, "admin role required")
+func (h *PostHandler) DeletePost(c *gin.Context) {
+	user := c.MustGet("user").(*auth.User)
+	if !user.IsAdmin() {
+		c.JSON(http.StatusForbidden, gin.H{"error": "admin role required"})
 		return
 	}
 
-	idStr := r.PathValue("id")
+	idStr := c.Param("id")
 	if idStr == "" {
-		writeJSONError(w, http.StatusBadRequest, "id is required")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
 		return
 	}
 
 	id, err := uuid.Parse(idStr)
 	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "invalid id format")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id format"})
 		return
 	}
 
-	if err := h.postRepo.Delete(r.Context(), id); err != nil {
+	if err := h.postRepo.Delete(c, id); err != nil {
 		status, message := statusCodeFromError(err)
-		writeJSONError(w, status, message)
+		c.JSON(status, gin.H{"error": message})
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
-}
-
-// helper functions
-
-func parsePagination(r *http.Request) (limit, offset int) {
-	limit = 10
-	offset = 0
-
-	if l := r.URL.Query().Get("limit"); l != "" {
-		if parsed, err := strconv.Atoi(l); err == nil && parsed > 0 && parsed <= 100 {
-			limit = parsed
-		}
-	}
-
-	if o := r.URL.Query().Get("offset"); o != "" {
-		if parsed, err := strconv.Atoi(o); err == nil && parsed >= 0 {
-			offset = parsed
-		}
-	}
-
-	return
-}
-
-func statusCodeFromError(err error) (int, string) {
-	var validationErr apierrors.ValidationError
-	var notFoundErr apierrors.NotFoundError
-	var conflictErr apierrors.ConflictError
-	var forbiddenErr apierrors.ForbiddenError
-
-	if errors.As(err, &validationErr) {
-		return http.StatusBadRequest, validationErr.Message
-	}
-	if errors.As(err, &notFoundErr) {
-		return http.StatusNotFound, notFoundErr.Message
-	}
-	if errors.As(err, &conflictErr) {
-		return http.StatusConflict, conflictErr.Message
-	}
-	if errors.As(err, &forbiddenErr) {
-		return http.StatusForbidden, forbiddenErr.Message
-	}
-
-	return http.StatusInternalServerError, "internal server error"
-}
-
-func writeJSONError(w http.ResponseWriter, statusCode int, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(view.ErrorResponse{Error: message})
+	c.Status(http.StatusNoContent)
 }

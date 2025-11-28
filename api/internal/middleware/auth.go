@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-gonic/gin"
 	"github.com/sochoa/sochoa.dev/api/internal/auth"
 )
 
@@ -119,4 +120,75 @@ func writeJSONError(w http.ResponseWriter, statusCode int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	fmt.Fprintf(w, `{"error":"%s"}`, message)
+}
+
+// RequireAuthGin returns a Gin middleware that validates JWT token and requires authentication
+func RequireAuthGin(tokenVerifier auth.TokenVerifier) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := extractToken(c.Request)
+		if token == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "missing authorization header"})
+			c.Abort()
+			return
+		}
+
+		user, err := tokenVerifier.VerifyToken(c.Request.Context(), token)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("invalid token: %v", err)})
+			c.Abort()
+			return
+		}
+
+		// Inject user into Gin context
+		c.Set("user", user)
+		c.Next()
+	}
+}
+
+// RequireAdminGin returns a Gin middleware that requires admin role
+func RequireAdminGin(tokenVerifier auth.TokenVerifier) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := extractToken(c.Request)
+		if token == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "missing authorization header"})
+			c.Abort()
+			return
+		}
+
+		user, err := tokenVerifier.VerifyToken(c.Request.Context(), token)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": fmt.Sprintf("invalid token: %v", err)})
+			c.Abort()
+			return
+		}
+
+		if !user.IsAdmin() {
+			c.JSON(http.StatusForbidden, gin.H{"error": "admin role required"})
+			c.Abort()
+			return
+		}
+
+		// Inject user into Gin context
+		c.Set("user", user)
+		c.Next()
+	}
+}
+
+// OptionalAuthGin returns a Gin middleware that validates JWT token if present, but doesn't require it
+func OptionalAuthGin(tokenVerifier auth.TokenVerifier) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := extractToken(c.Request)
+
+		// If token is present, verify it. Otherwise, continue without user.
+		if token != "" {
+			user, err := tokenVerifier.VerifyToken(c.Request.Context(), token)
+			if err == nil {
+				// Inject user into Gin context if verification succeeded
+				c.Set("user", user)
+			}
+			// If verification failed, continue without user (optional)
+		}
+
+		c.Next()
+	}
 }

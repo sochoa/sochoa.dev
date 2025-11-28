@@ -1,19 +1,119 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"log/slog"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/sochoa/sochoa.dev/api/internal/auth"
+	"github.com/sochoa/sochoa.dev/api/internal/config"
+	"github.com/sochoa/sochoa.dev/api/internal/db"
+	"github.com/sochoa/sochoa.dev/api/internal/handler"
+	"github.com/sochoa/sochoa.dev/api/internal/logger"
+	"github.com/sochoa/sochoa.dev/api/internal/model"
 )
 
-var rootCmd = &cobra.Command{
-	Use:   "api",
-	Short: "sochoa.dev API - personal website backend",
-	Long:  "sochoa.dev API is a REST API for a personal website with blog, guestbook, and analytics",
-	Run: func(_ *cobra.Command, _ []string) {
-		fmt.Println("sochoa.dev API - under construction")
-	},
+var (
+	port string
+
+	rootCmd = &cobra.Command{
+		Use:   "api",
+		Short: "sochoa.dev API - personal website backend",
+		Long:  "sochoa.dev API is a REST API for a personal website with blog, guestbook, and analytics",
+	}
+
+	serveCmd = &cobra.Command{
+		Use:   "serve",
+		Short: "Start the API server",
+		Long:  "Start the Gin-based API server",
+		RunE:  serve,
+	}
+)
+
+func init() {
+	rootCmd.AddCommand(serveCmd)
+	serveCmd.Flags().StringVar(&port, "port", "8080", "Port to listen on")
+}
+
+func serve(_ *cobra.Command, _ []string) error {
+	// Load configuration
+	cfg, err := config.Load()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to load config: %v\n", err)
+		return err
+	}
+
+	// Initialize logger
+	log := logger.Setup(cfg.LogLevel)
+
+	// Initialize database
+	database, err := db.Connect(context.Background(), cfg.DBDsn)
+	if err != nil {
+		log.Error("failed to initialize database", slog.String("error", err.Error()))
+		return err
+	}
+	defer database.Close()
+
+	// Initialize repositories
+	postRepo := model.NewPostRepository(database)
+	guestbookRepo := model.NewGuestbookRepository(database)
+	contactRepo := model.NewContactRepository(database)
+	statsRepo := model.NewStatsRepository(database)
+
+	// Initialize token verifier
+	tokenVerifier := auth.NewCognitoVerifier(cfg.CognitoUserPoolID, cfg.AWSRegion)
+
+	// Create router and register routes
+	apiRouter := handler.NewRouter(
+		log,
+		tokenVerifier,
+		postRepo,
+		guestbookRepo,
+		contactRepo,
+		statsRepo,
+	)
+	ginEngine := apiRouter.Register()
+
+	// Create HTTP server
+	server := &http.Server{
+		Addr:         ":" + port,
+		Handler:      ginEngine,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+
+	// Start server in goroutine
+	go func() {
+		log.Info("starting server", slog.String("address", server.Addr))
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Error("server error", slog.String("error", err.Error()))
+		}
+	}()
+
+	// Wait for interrupt signal
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
+
+	// Graceful shutdown
+	log.Info("shutting down server")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Error("failed to shutdown server gracefully", slog.String("error", err.Error()))
+		return err
+	}
+
+	log.Info("server stopped")
+	return nil
 }
 
 func main() {
