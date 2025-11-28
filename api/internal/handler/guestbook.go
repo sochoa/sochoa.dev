@@ -51,7 +51,7 @@ func (h *GuestbookHandler) SubmitGuestbookEntry(c *gin.Context) {
 
 	// Check rate limit: 3 entries per day per user
 	since := model.GetStartOfDay()
-	count, err := h.guestbookRepo.CountByUserInTimeWindow(c, "cognito", user.ID, since)
+	count, err := h.guestbookRepo.CountByUserInTimeWindow(c, "google", user.ID, since)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to check rate limit"})
 		return
@@ -63,7 +63,7 @@ func (h *GuestbookHandler) SubmitGuestbookEntry(c *gin.Context) {
 	}
 
 	entry := &model.GuestbookEntry{
-		UserProvider: "cognito",
+		UserProvider: "google",
 		UserID:       user.ID,
 		DisplayName:  req.DisplayName,
 		Message:      req.Message,
@@ -72,6 +72,9 @@ func (h *GuestbookHandler) SubmitGuestbookEntry(c *gin.Context) {
 
 	if err := h.guestbookRepo.Create(c, entry); err != nil {
 		status, message := statusCodeFromError(err)
+		if status == http.StatusInternalServerError {
+			c.Error(err)
+		}
 		c.JSON(status, gin.H{"error": message})
 		return
 	}

@@ -198,7 +198,7 @@ func (r *PostRepository) ListPublished(ctx context.Context, limit int, offset in
 	query := `
 		SELECT id, slug, title, summary, body, tags, status, published_at, created_at, updated_at
 		FROM posts
-		WHERE status = $1 AND deleted_at IS NULL
+		WHERE status = $1
 	`
 	args := []interface{}{PostStatusPublished}
 

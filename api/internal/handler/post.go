@@ -57,6 +57,10 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 
 	if err := h.postRepo.Create(c, post); err != nil {
 		status, message := statusCodeFromError(err)
+		if status == http.StatusInternalServerError {
+			// Log the actual error for debugging
+			c.Error(err)
+		}
 		c.JSON(status, gin.H{"error": message})
 		return
 	}
@@ -98,6 +102,7 @@ func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 
 	posts, err := h.postRepo.ListPublished(c, limit, offset, tag)
 	if err != nil {
+		c.Error(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to list posts"})
 		return
 	}

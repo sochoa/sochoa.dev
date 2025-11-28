@@ -25,8 +25,8 @@ func NewStatsHandler(statsRepo *model.StatsRepository) *StatsHandler {
 
 // RecordStatsRequest represents the request body for recording stats
 type RecordStatsRequest struct {
-	Date           time.Time  `json:"date"`
-	PagePath       string     `json:"page_path"`
+	Date           string     `json:"date" binding:"required"`
+	PagePath       string     `json:"page_path" binding:"required"`
 	Country        *string    `json:"country,omitempty"`
 	ReferrerDomain *string    `json:"referrer_domain,omitempty"`
 	Pageviews      int        `json:"pageviews"`
@@ -54,8 +54,15 @@ func (h *StatsHandler) RecordStats(c *gin.Context) {
 		return
 	}
 
+	// Parse date string (format: YYYY-MM-DD)
+	parsedDate, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid date format (use YYYY-MM-DD)"})
+		return
+	}
+
 	stat := &model.VisitorStat{
-		Date:           req.Date,
+		Date:           parsedDate,
 		PagePath:       req.PagePath,
 		Country:        req.Country,
 		ReferrerDomain: req.ReferrerDomain,

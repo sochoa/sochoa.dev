@@ -83,11 +83,12 @@ func (r *GuestbookRepository) Create(ctx context.Context, entry *GuestbookEntry)
 		return err
 	}
 
-	entry.CreatedAt = time.Now().UTC()
+	now := time.Now().UTC()
+	entry.CreatedAt = now
 
 	query := `
-		INSERT INTO guestbook_entries (id, user_provider, user_id, display_name, message, is_approved, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		INSERT INTO guestbook_entries (id, user_provider, user_id, display_name, message, approved, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	`
 
 	_, err := r.db.ExecContext(ctx, query,
@@ -98,6 +99,7 @@ func (r *GuestbookRepository) Create(ctx context.Context, entry *GuestbookEntry)
 		entry.Message,
 		entry.IsApproved,
 		entry.CreatedAt,
+		now,
 	)
 
 	if err != nil {
@@ -112,7 +114,7 @@ func (r *GuestbookRepository) GetByID(ctx context.Context, id uuid.UUID) (*Guest
 	entry := &GuestbookEntry{}
 
 	query := `
-		SELECT id, user_provider, user_id, display_name, message, is_approved, deleted_at, created_at
+		SELECT id, user_provider, user_id, display_name, message, approved, deleted_at, created_at
 		FROM guestbook_entries
 		WHERE id = $1
 	`
@@ -142,9 +144,9 @@ func (r *GuestbookRepository) GetByID(ctx context.Context, id uuid.UUID) (*Guest
 // ListApproved retrieves all approved guestbook entries, ordered by creation time (newest first)
 func (r *GuestbookRepository) ListApproved(ctx context.Context, limit int, offset int) ([]GuestbookEntry, error) {
 	query := `
-		SELECT id, user_provider, user_id, display_name, message, is_approved, deleted_at, created_at
+		SELECT id, user_provider, user_id, display_name, message, approved, deleted_at, created_at
 		FROM guestbook_entries
-		WHERE is_approved = true AND deleted_at IS NULL
+		WHERE approved = true AND deleted_at IS NULL
 		ORDER BY created_at DESC
 		LIMIT $1 OFFSET $2
 	`
@@ -180,9 +182,9 @@ func (r *GuestbookRepository) ListApproved(ctx context.Context, limit int, offse
 // ListPending retrieves all pending (not approved) guestbook entries for moderation
 func (r *GuestbookRepository) ListPending(ctx context.Context, limit int, offset int) ([]GuestbookEntry, error) {
 	query := `
-		SELECT id, user_provider, user_id, display_name, message, is_approved, deleted_at, created_at
+		SELECT id, user_provider, user_id, display_name, message, approved, deleted_at, created_at
 		FROM guestbook_entries
-		WHERE is_approved = false AND deleted_at IS NULL
+		WHERE approved = false AND deleted_at IS NULL
 		ORDER BY created_at ASC
 		LIMIT $1 OFFSET $2
 	`
@@ -217,7 +219,7 @@ func (r *GuestbookRepository) ListPending(ctx context.Context, limit int, offset
 
 // Approve marks a guestbook entry as approved
 func (r *GuestbookRepository) Approve(ctx context.Context, id uuid.UUID) error {
-	query := `UPDATE guestbook_entries SET is_approved = true WHERE id = $1`
+	query := `UPDATE guestbook_entries SET approved = true WHERE id = $1`
 
 	result, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
