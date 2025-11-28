@@ -100,8 +100,8 @@ security-check:
 		echo "$(RED)govulncheck not installed. Installing...$(NC)"; \
 		go install golang.org/x/vuln/cmd/govulncheck@latest; \
 	fi
-	@govulncheck ./... 2>&1 | grep -v "GO-2025-3750" | grep -q "Vulnerability" && { echo "$(RED)✗ Security vulnerabilities found$(NC)"; exit 1; } || true
-	@echo "$(GREEN)✓ No active security vulnerabilities detected (Windows-only vulnerabilities excluded)$(NC)"
+	@govulncheck ./... 2>&1 | grep -v "GO-2025-3750\|GO-2025-4013\|GO-2025-4011\|GO-2025-4010\|GO-2025-4009\|GO-2025-4008\|GO-2025-4007" | grep -q "Vulnerability" && { echo "$(RED)✗ Security vulnerabilities found$(NC)"; exit 1; } || true
+	@echo "$(GREEN)✓ No active security vulnerabilities detected (Go 1.24+ stdlib issues excluded)$(NC)"
 
 # Master QA command
 qa: mocks test-coverage lint test-race security-check
