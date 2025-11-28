@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/sochoa/api/internal/logger" // nosec
+	"github.com/sochoa/sochoa.dev/api/internal/logger" // nosec
 )
 
 // contextKeyRequestID is used to store the request ID in request context

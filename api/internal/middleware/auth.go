@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/sochoa/api/internal/auth"
+	"github.com/sochoa/sochoa.dev/api/internal/auth"
 )
 
 // contextKeyUser is used to store the user in request context

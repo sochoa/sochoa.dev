@@ -1,4 +1,4 @@
-module github.com/sochoa/api
+module github.com/sochoa/sochoa.dev/api
 
 go 1.25
 

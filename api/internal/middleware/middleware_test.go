@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sochoa/api/internal/auth"
-	"github.com/sochoa/api/internal/logger"
+	"github.com/sochoa/sochoa.dev/api/internal/auth"
+	"github.com/sochoa/sochoa.dev/api/internal/logger"
 )
 
 // mockTokenVerifier is a test implementation of TokenVerifier
