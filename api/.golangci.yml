@@ -1,0 +1,109 @@
+# golangci-lint configuration for sochoa.dev API
+# Reference: https://golangci-lint.run/
+
+run:
+  # Timeout for analysis per each file, in s
+  timeout: 5m
+  # Exit code when at least one issue was found
+  issues-exit-code: 1
+  # Include test files
+  tests: true
+  # Number of concurrent analysis workers
+  go: 1.23
+
+output:
+  # The formats of the output
+  # Options: colored-line-number|line-number|json|tab|checkstyle|code-climate|junit-xml|github-actions|teamcity
+  formats:
+    - format: colored-line-number
+  # Print lines of code with issue
+  print-issued-lines: true
+  # Print linter name in the end of issue text
+  print-linter-name: true
+
+linters:
+  # Disable all linters by default and only enable the ones we want
+  disable-all: true
+
+  # ENABLED LINTERS (strict quality checks)
+  enable:
+    # Errcheck checks for unchecked errors in go programs
+    # This is critical - we must handle all errors explicitly
+    - errcheck
+
+    # Ineffassign detects when assignments to existing variables are not used
+    # Helps identify dead code and logic errors
+    - ineffassign
+
+    # Unused checks for unused constants, variables, functions and types
+    # Keeps codebase clean and reduces confusion
+    - unused
+
+    # Misspell finds commonly misspelled English words in comments
+    # Improves code documentation quality
+    - misspell
+
+    # Govet runs go vet on our code
+    # Catches common programming mistakes (shadowing, unsafe pointer operations, etc)
+    - govet
+
+    # Staticcheck performs advanced static analysis checks
+    # Detects bugs, performance issues, and code simplifications
+    - staticcheck
+
+    # Goimports checks that standard packages are imported in the correct order
+    # Maintains consistent code formatting
+    - goimports
+
+    # Unconvert detects unnecessary type conversions
+    # Keeps code clean and maintainable
+    - unconvert
+
+    # Typecheck type-checks Go code
+    - typecheck
+
+    # Gofmt checks that code is properly formatted
+    - gofmt
+
+    # Revive is a fast, configurable, extensible, flexible, and beautiful linter for Go
+    # Drop-in replacement for golint
+    - revive
+
+  # DISABLED LINTERS (too strict or not applicable)
+  # lll: We disable line length checks. Our style prefers readable code over artificial line limits.
+  #      The default 80 character limit is outdated for modern screens and IDEs.
+  # gocritic: Advanced linter with many optional checks - enable selectively if needed
+  # varcheck: Covered by unused linter
+  # structcheck: Covered by unused linter
+
+issues:
+  # Exit immediately with an error if any issues are found
+  fix: false
+
+  # Maximum issues count per one linter
+  max-per-linter: 0
+
+  # Maximum number of issues
+  max-issues: 0
+
+  # Exclude files or directories
+  exclude-dirs:
+    - mocks
+
+  # Exclude issue by regexp
+  exclude-rules:
+    # Exclude test files from some linters
+    - path: _test\.go$
+      linters:
+        - typecheck
+        - unused
+
+severity:
+  # Set the default severity for issues
+  default-severity: error
+
+  # The rules for nolint comments to override default values
+  rules:
+    - linters:
+        - errcheck
+      severity: error

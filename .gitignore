@@ -180,3 +180,11 @@ thumb
 sketch
 
 # End of https://www.toptal.com/developers/gitignore/api/node,go,react
+
+# Generated mocks (in api directory)
+api/mocks/
+
+# Build artifacts
+bin/
+*.out
+coverage.html

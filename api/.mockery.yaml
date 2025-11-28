@@ -1,0 +1,22 @@
+# Mockery configuration for sochoa.dev API
+# Reference: https://vektra.github.io/mockery/
+
+# Global configuration for all packages
+config:
+  # Directory where mocks will be generated
+  outdir: "mocks"
+
+  # Output format for mocks (testify or standard)
+  output-by-package: true
+
+  # Naming convention for mocks: Mock{InterfaceName}
+  mockname: "Mock{{ .InterfaceName }}"
+
+  # Enable stripping package names from mock names
+  with-expecter: true
+
+# Packages to mock - scan internal package for all interfaces
+packages:
+  github.com/sochoa/api/internal/auth: {}
+  github.com/sochoa/api/internal/db: {}
+  github.com/sochoa/api/internal/config: {}
