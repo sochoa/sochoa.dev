@@ -4,19 +4,30 @@ FROM golang:1.25-alpine AS builder
 WORKDIR /build
 
 # Install build dependencies (including gcc for CGO/SQLite)
+# Cached layer: only invalidates if apk packages change
 RUN apk add --no-cache git ca-certificates tzdata gcc musl-dev sqlite-dev
 
-# Copy go mod files
+# Copy go mod files (separate layer for better caching)
+# Cached layer: only invalidates if go.mod/go.sum change
 COPY go.mod go.sum ./
 
-# Download dependencies
+# Download dependencies (cached layer)
+# This layer stays cached if source code changes but go.mod doesn't
 RUN go mod download
 
-# Copy source code
+# Copy source code (invalidates cache if any source changes)
 COPY . .
 
-# Build the binary
-RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o api .
+# Build the binary with optimizations
+# Flags:
+#   -trimpath: remove absolute paths (reproducible builds, better caching)
+#   -ldflags="-s -w": strip symbols & debug info (10-20% smaller binary)
+RUN CGO_ENABLED=1 GOOS=linux \
+    go build \
+      -trimpath \
+      -ldflags="-s -w" \
+      -o api \
+      .
 
 # Runtime stage
 FROM alpine:latest
