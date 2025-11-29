@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { getPostBySlug, type PostResponse } from '@/api'
 
 interface Post {
   id: string
@@ -7,7 +8,7 @@ interface Post {
   title: string
   body: string
   createdAt: string
-  tags: string[]
+  tags?: string[]
 }
 
 export default function BlogPost() {
@@ -22,20 +23,25 @@ export default function BlogPost() {
   }, [slug])
 
   async function fetchPost() {
+    if (!slug) return
+
     try {
       setLoading(true)
-      const response = await fetch(`/api/posts/${slug}`)
-      if (!response.ok) {
-        if (response.status === 404) {
-          setError('Post not found')
-          return
-        }
-        throw new Error('Failed to load post')
-      }
-      const data = await response.json()
-      setPost(data)
+      const data = await getPostBySlug(slug)
+      setPost({
+        id: data.id,
+        slug: data.slug,
+        title: data.title,
+        body: data.body,
+        createdAt: data.created_at,
+        tags: data.tags,
+      })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      if (err instanceof Error && err.message.includes('404')) {
+        setError('Post not found')
+      } else {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      }
     } finally {
       setLoading(false)
     }

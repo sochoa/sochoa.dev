@@ -1,12 +1,5 @@
 import { useEffect, useState } from 'react'
-
-interface Stat {
-  date: string
-  pageViews: number
-  uniqueVisitors: number
-  topPage: string
-  referrer: string
-}
+import { listStats, type VisitorStatResponse } from '@/api'
 
 interface StatsData {
   totalPageViews: number
@@ -14,7 +7,7 @@ interface StatsData {
   averagePageViews: number
   topPages: Array<{ page: string; views: number }>
   topReferrers: Array<{ referrer: string; count: number }>
-  recentStats: Stat[]
+  recentStats: VisitorStatResponse[]
 }
 
 export default function VisitorStats() {
@@ -26,18 +19,56 @@ export default function VisitorStats() {
     async function fetchStats() {
       try {
         setLoading(true)
-        const response = await fetch('/api/stats')
-        if (!response.ok) {
-          throw new Error('Failed to load statistics')
+        const data = await listStats()
+
+        if (!data || data.length === 0) {
+          setStats({
+            totalPageViews: 0,
+            totalUniqueVisitors: 0,
+            averagePageViews: 0,
+            topPages: [],
+            topReferrers: [],
+            recentStats: [],
+          })
+          return
         }
-        const data = await response.json()
-        setStats(data || {
-          totalPageViews: 0,
-          totalUniqueVisitors: 0,
-          averagePageViews: 0,
-          topPages: [],
-          topReferrers: [],
-          recentStats: [],
+
+        // Calculate aggregated stats
+        const totalPageViews = data.reduce((sum, s) => sum + (s.pageviews || 0), 0)
+        const totalUniqueVisitors = data.reduce((sum, s) => sum + (s.unique_visitors || 0), 0)
+        const averagePageViews = data.length > 0 ? Math.round(totalPageViews / data.length) : 0
+
+        // Group by page to get top pages
+        const pageStats = new Map<string, number>()
+        data.forEach((stat) => {
+          const current = pageStats.get(stat.page_path) || 0
+          pageStats.set(stat.page_path, current + (stat.pageviews || 0))
+        })
+        const topPages = Array.from(pageStats.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([page, views]) => ({ page, views }))
+
+        // Group by referrer to get top referrers
+        const referrerStats = new Map<string, number>()
+        data.forEach((stat) => {
+          if (stat.referrer_domain) {
+            const current = referrerStats.get(stat.referrer_domain) || 0
+            referrerStats.set(stat.referrer_domain, current + 1)
+          }
+        })
+        const topReferrers = Array.from(referrerStats.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5)
+          .map(([referrer, count]) => ({ referrer, count }))
+
+        setStats({
+          totalPageViews,
+          totalUniqueVisitors,
+          averagePageViews,
+          topPages,
+          topReferrers,
+          recentStats: data,
         })
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load statistics')

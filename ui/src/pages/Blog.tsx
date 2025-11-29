@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { listPosts, type PostResponse } from '@/api'
 
 interface Post {
   id: string
   slug: string
   title: string
-  summary: string
+  summary?: string
   createdAt: string
-  tags: string[]
+  tags?: string[]
 }
 
 export default function Blog() {
@@ -23,10 +24,17 @@ export default function Blog() {
   async function fetchPosts() {
     try {
       setLoading(true)
-      const response = await fetch('/api/posts')
-      if (!response.ok) throw new Error('Failed to load posts')
-      const data = await response.json()
-      setPosts(data || [])
+      const data = await listPosts()
+      setPosts(
+        (data || []).map((post) => ({
+          id: post.id,
+          slug: post.slug,
+          title: post.title,
+          summary: post.summary,
+          createdAt: post.created_at,
+          tags: post.tags,
+        }))
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {

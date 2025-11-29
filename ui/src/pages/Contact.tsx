@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { submitContact } from '@/api'
 
 interface FormData {
   name: string
@@ -63,15 +64,11 @@ export default function Contact() {
     setState((s) => ({ ...s, isSubmitting: true, error: undefined }))
 
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state.data),
+      await submitContact({
+        name: state.data.name,
+        email: state.data.email,
+        message: state.data.message,
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to submit form')
-      }
 
       setState({
         data: { name: '', email: '', message: '' },

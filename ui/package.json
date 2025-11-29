@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "api:generate": "npx @openapitools/openapi-generator-cli generate",
-    "dev": "npm run api:generate && vite",
-    "build": "npm run api:generate && tsc && vite build",
+    "dev": "vite",
+    "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives",
     "type-check": "tsc --noEmit",

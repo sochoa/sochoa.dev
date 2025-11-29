@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { fetchAuthSession } from '@aws-amplify/auth'
 import { useAuthStore } from '../stores/authStore'
+import { listGuestbookEntries, submitGuestbookEntry, type GuestbookEntryResponse } from '@/api'
 
 interface GuestbookEntry {
   id: string
-  displayName: string
-  message: string
+  displayName?: string
+  message?: string
   createdAt: string
 }
 
@@ -44,10 +44,15 @@ export default function Guestbook() {
   async function fetchEntries() {
     try {
       setLoading(true)
-      const response = await fetch('/api/guestbook')
-      if (!response.ok) throw new Error('Failed to load entries')
-      const data = await response.json()
-      setEntries(data || [])
+      const data = await listGuestbookEntries()
+      setEntries(
+        (data || []).map((entry) => ({
+          id: entry.id,
+          displayName: entry.display_name,
+          message: entry.message,
+          createdAt: entry.created_at,
+        }))
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load entries')
     } finally {
@@ -91,30 +96,11 @@ export default function Guestbook() {
     setFormState((s) => ({ ...s, isSubmitting: true, error: undefined }))
 
     try {
-      const session = await fetchAuthSession()
-      const token = session?.tokens?.accessToken?.toString()
-
-      if (!token) {
-        throw new Error('No authentication token available')
-      }
-
-      const response = await fetch('/api/guestbook', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          display_name: formState.data.displayName,
-          message: formState.data.message,
-          honeypot: formState.data.honeypot,
-        }),
+      await submitGuestbookEntry({
+        display_name: formState.data.displayName,
+        message: formState.data.message,
+        honeypot: formState.data.honeypot,
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to submit entry')
-      }
 
       setFormState({
         data: { displayName: '', message: '', honeypot: '' },
