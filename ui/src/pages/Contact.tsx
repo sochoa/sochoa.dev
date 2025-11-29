@@ -119,7 +119,7 @@ export default function Contact() {
               type="text"
               id="name"
               name="name"
-              label="Name"
+              label="Your Name"
               value={state.data.name}
               onChange={handleChange}
               disabled={state.isSubmitting}
@@ -130,7 +130,7 @@ export default function Contact() {
               type="email"
               id="email"
               name="email"
-              label="Email"
+              label="Your Email"
               value={state.data.email}
               onChange={handleChange}
               disabled={state.isSubmitting}
@@ -141,7 +141,7 @@ export default function Contact() {
               <Textarea
                 id="message"
                 name="message"
-                label="Message"
+                label="How can I help?"
                 value={state.data.message}
                 onChange={handleChange}
                 disabled={state.isSubmitting}

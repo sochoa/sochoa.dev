@@ -26,10 +26,12 @@ export default function About() {
   ]
 
   const expertise = [
-    { category: 'Backend', skills: ['Go', 'Node.js', 'Python', 'PostgreSQL', 'Redis'] },
-    { category: 'Frontend', skills: ['React', 'TypeScript', 'TailwindCSS', 'Next.js'] },
+    { category: 'Backend', skills: ['PostgreSQL', 'Redis', 'Memcache'] },
+    { category: 'Frontend', skills: ['React', 'TypeScript', 'TailwindCSS'] },
     { category: 'Infrastructure', skills: ['AWS', 'Docker', 'Kubernetes', 'CI/CD'] },
-    { category: 'Specialties', skills: ['System Design', 'Performance Optimization', 'Security Engineering', 'Mentoring'] },
+    { category: 'Languages', skills: ['Go', 'Javascript/Typescript', 'Python', 'Bash', 'Java', 'Ruby', 'Powershell'] },
+    { category: 'Specialties', skills: ['Systems Design', 'Security Engineering', 'Mentoring'] },
+    { category: 'Configuration', skills: ['Chef', 'Puppet', 'Ansible', 'Salt'] },
   ]
 
   return (
@@ -43,18 +45,13 @@ export default function About() {
             <h1 className="text-4xl font-bold text-accent-purple mb-4 font-mono">
               About Me
             </h1>
-            <p className="text-lg text-text-secondary mb-4">
-                Hi! I'm an experienced software, systems, security, and infrastructure engineer.  My work spans
+            <p className="text-lg text-text-secondary mb-2">
+                I am an experienced software, systems, security, and infrastructure engineer.  My work spans
                 distributed backend services, infrastructure automation, cloud native systems, security
                 infrastructure, and developer tooling that helps teams move faster and safer.
-            </p>
-            <p className="text-lg text-text-secondary mb-4">
               When I'm not building or designing, you'll find me tinkering, writing, mentoring, and exploring
               new ideas. I believe in clean self-documenting code, automated security validation, and enabling
               my team to do more with less.
-            </p>
-            <p className="text-lg text-text-secondary">
-              Currently focused on building scalable data center controls systems at Amazon Web Services (11/2025).
             </p>
           </div>
         </div>
@@ -92,7 +89,7 @@ export default function About() {
 
       {/* Expertise Section */}
       <Section title="Expertise" spacing="normal">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {expertise.map((group) => (
             <div key={group.category}>
               <h3 className="text-lg font-semibold text-text-primary mb-4 font-mono">
