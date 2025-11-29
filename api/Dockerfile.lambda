@@ -1,0 +1,32 @@
+# Build stage
+FROM golang:1.25-alpine AS builder
+
+WORKDIR /build
+
+# Install build dependencies (including gcc for CGO/SQLite)
+RUN apk add --no-cache git ca-certificates tzdata gcc musl-dev sqlite-dev
+
+# Copy go mod files
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build the binary for Lambda (requires specific entry point)
+# Lambda will call this binary, so it needs a compatible handler
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -a -installsuffix cgo -o bootstrap .
+
+# Lambda runtime stage
+FROM public.ecr.aws/lambda/provided:al2.2024.12.11-arm64
+
+# Copy ca-certificates from builder
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# Copy bootstrap binary (Lambda expects this name)
+COPY --from=builder /build/bootstrap ${LAMBDA_TASK_ROOT}
+
+# Set the CMD to your handler
+CMD [ "bootstrap" ]
