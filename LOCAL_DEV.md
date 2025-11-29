@@ -1,8 +1,49 @@
 # Local Development Setup
 
-Two options for local development without Docker:
+Three options for local development:
 
-## Option 1: Taskfile (Recommended)
+## Option 0: Colima (Container-based)
+
+Lightweight container runtime for Mac. Works exactly like Docker but without the overhead.
+
+### Install Colima
+
+```bash
+brew install colima
+```
+
+### Usage
+
+```bash
+# Start Colima (one-time per session)
+colima start
+
+# Then use docker-compose as usual
+docker-compose up
+
+# Stop when done
+colima stop
+```
+
+The existing `docker-compose.yml` works unchanged. All `docker` and `docker-compose` commands work normally.
+
+### Why Colima?
+- ✅ Drop-in Docker replacement (same CLI)
+- ✅ Lightweight and fast
+- ✅ Free and open-source
+- ✅ Works with your existing docker-compose.yml
+- ✅ Better resource usage than Docker Desktop on Mac
+
+### Access API
+
+Once running:
+- **Swagger UI**: http://localhost:8080/
+- **Health Check**: http://localhost:8080/api/health
+- **API**: http://localhost:8080/api/*
+
+---
+
+## Option 1: Taskfile (Recommended for native execution)
 
 Closest to docker-compose experience. YAML-based, works great on Mac.
 
@@ -94,11 +135,15 @@ make help
 ### First Time
 
 ```bash
-# Option 1: Taskfile
+# Option 0: Colima (containers)
+colima start
+docker-compose up
+
+# Option 1: Taskfile (native execution)
 task setup
 task api
 
-# Option 2: Make
+# Option 2: Make (native execution)
 make setup
 make api
 ```
@@ -106,6 +151,10 @@ make api
 ### Every Other Time
 
 ```bash
+# Option 0: Colima
+colima start
+docker-compose up
+
 # Option 1: Taskfile
 task api
 
@@ -121,15 +170,15 @@ Then visit: **http://localhost:8080/**
 
 ### Common Tasks
 
-| Goal | Taskfile | Make |
-|------|----------|------|
-| Start API | `task api` | `make api` |
-| Hot-reload | `task api:dev` | `make api-dev` |
-| Build binary | `task api:build` | `make api-build` |
-| Run tests | `task api:test` | `make api-test` |
-| Reset DB | `task db-reset` | `make db-reset` |
-| DB shell | `task db:shell` | `make db-shell` |
-| View logs | `task logs` | `make logs` |
+| Goal | Colima | Taskfile | Make |
+|------|--------|----------|------|
+| Start services | `docker-compose up` | `task api` | `make api` |
+| Hot-reload | N/A | `task api:dev` | `make api-dev` |
+| Build binary | `docker build api` | `task api:build` | `make api-build` |
+| Run tests | `docker-compose exec api go test ./...` | `task api:test` | `make api-test` |
+| Reset DB | `docker-compose down -v` | `task db-reset` | `make db-reset` |
+| DB shell | `docker-compose exec api sqlite3 ...` | `task db:shell` | `make db-shell` |
+| View logs | `docker-compose logs api` | `task logs` | `make logs` |
 
 ### Hot-Reload with Air
 
@@ -188,19 +237,24 @@ LOG_LEVEL=info task api
 
 ---
 
-## Choosing Between Task and Make
+## Choosing Your Approach
+
+**Use Colima if:**
+- You want actual containers (isolation, consistency)
+- You're used to docker-compose workflow
+- You like having a container runtime
 
 **Use Taskfile if:**
-- You want YAML-like config (familiar from docker-compose)
-- You like modern tooling
-- You want parallel task execution
+- You want native execution on your Mac
+- You prefer YAML config syntax
+- You want fast iteration without container overhead
 
 **Use Make if:**
 - You want no additional dependencies
 - You prefer traditional approach
 - You want maximum compatibility
 
-Both are equally valid. Pick what feels right for your workflow!
+Pick what feels right for your workflow! All three approaches work equally well.
 
 ---
 
@@ -209,13 +263,23 @@ Both are equally valid. Pick what feels right for your workflow!
 Run both API and UI:
 
 ```bash
-task full:dev    # Taskfile
-make full-dev    # Make
+# Option 0: Colima (containers)
+colima start
+docker-compose up
+
+# Option 1: Taskfile (native)
+task full:dev
+
+# Option 2: Make (native)
+make full-dev
 ```
 
 This starts:
-- API on http://localhost:8080
-- UI dev server on http://localhost:5173 (or next available port)
+- **API** on http://localhost:8080 (Swagger UI at /)
+- **UI dev server** on http://localhost:5173 (or next available port)
+- Both share the same database
+
+Visit http://localhost:5173 to access the UI and make API requests.
 
 ---
 
@@ -243,4 +307,29 @@ Use custom port:
 task api -- --port 3000
 # or
 cd api && go build -o api ./ && ./api --port 3000
+# or with Colima
+docker-compose up -p custom_name_3000
+```
+
+### Colima won't start
+Make sure you have virtualization enabled on your Mac (M-series support):
+```bash
+colima start --vm-type vz  # Recommended for M1/M2/M3 Macs
+# or for Intel:
+colima start --vm-type qemu
+```
+
+### Colima is slow/resource issues
+Increase resource limits:
+```bash
+colima stop
+colima start --cpu 4 --memory 8 --disk 60  # Adjust as needed
+```
+
+### Need to reset Colima
+```bash
+colima stop
+colima delete  # Deletes VM and all containers
+colima start
+docker-compose up --build  # Rebuild images
 ```
