@@ -12,7 +12,8 @@ export function AppInitializer() {
       // Configure Amplify with Cognito settings if available
       if (isConfigured()) {
         try {
-          Amplify.configure(cognitoConfig)
+          // Type assertion needed due to Amplify's strict type definitions
+          Amplify.configure(cognitoConfig as any)
         } catch (error) {
           console.error('Failed to configure Amplify:', error)
         }

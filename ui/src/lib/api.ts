@@ -11,9 +11,23 @@ export async function apiCall(
 ) {
   const { authenticated = false, ...fetchOptions } = options
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...fetchOptions.headers,
+  }
+
+  // Merge existing headers
+  if (fetchOptions.headers) {
+    if (fetchOptions.headers instanceof Headers) {
+      fetchOptions.headers.forEach((value, key) => {
+        headers[key] = value
+      })
+    } else if (Array.isArray(fetchOptions.headers)) {
+      fetchOptions.headers.forEach(([key, value]) => {
+        headers[key] = value
+      })
+    } else {
+      Object.assign(headers, fetchOptions.headers as Record<string, string>)
+    }
   }
 
   if (authenticated) {
