@@ -11,7 +11,7 @@ import { LambdaConstruct } from './constructs/lambda';
 import { ApiGatewayConstruct } from './constructs/api_gateway';
 import { CloudWatchConstruct } from './constructs/cloudwatch';
 
-export class CdkStack extends cdk.Stack {
+export class PrimaryStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
