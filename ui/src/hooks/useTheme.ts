@@ -12,13 +12,13 @@ const AVAILABLE_THEMES = [
 ]
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<string>('dracula')
+  const [theme, setThemeState] = useState<string>('dim')
   const [palette, setPaletteState] = useState<string>('cyan')
 
   useEffect(() => {
     // Check if user has saved preferences
     const savedTheme = localStorage.getItem('daisyui-theme')
-    const initialTheme = savedTheme && AVAILABLE_THEMES.includes(savedTheme) ? savedTheme : 'dracula'
+    const initialTheme = savedTheme && AVAILABLE_THEMES.includes(savedTheme) ? savedTheme : 'dim'
 
     const savedPalette = localStorage.getItem('color-palette')
     const initialPalette = savedPalette && COLOR_PALETTES.some((p) => p.id === savedPalette) ? savedPalette : 'cyan'
