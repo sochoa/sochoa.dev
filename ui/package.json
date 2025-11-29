@@ -4,7 +4,7 @@
   "description": "React + TypeScript + TailwindCSS UI for sochoa.dev",
   "type": "module",
   "scripts": {
-    "api:generate": "openapi-generator-cli generate",
+    "api:generate": "npx @openapitools/openapi-generator-cli generate",
     "dev": "npm run api:generate && vite",
     "build": "npm run api:generate && tsc && vite build",
     "preview": "vite preview",
