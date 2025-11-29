@@ -1,0 +1,28 @@
+{
+  "$schema": "node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generations": [
+    {
+      "inputSpec": "../api/docs/swagger.yaml",
+      "generatorName": "typescript-fetch",
+      "outputDir": "src/api/generated",
+      "additionalProperties": {
+        "apiPackage": "api",
+        "modelPackage": "models",
+        "npmName": "sochoa-api",
+        "npmVersion": "1.0.0",
+        "withSeparateModelsAndApi": true,
+        "modelFileSuffix": ".ts",
+        "supportsES6": true,
+        "typescriptThreePlus": true,
+        "enumPropertyNaming": "PascalCase"
+      },
+      "globalProperties": {
+        "apis": true,
+        "models": true,
+        "modelDocs": false,
+        "apiDocs": false
+      }
+    }
+  ]
+}

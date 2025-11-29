@@ -4,8 +4,9 @@
   "description": "React + TypeScript + TailwindCSS UI for sochoa.dev",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "api:generate": "openapi-generator-cli generate",
+    "dev": "npm run api:generate && vite",
+    "build": "npm run api:generate && tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives",
     "type-check": "tsc --noEmit",
@@ -20,6 +21,7 @@
     "zustand": "^4.4.0"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.3",
     "@tailwindcss/typography": "^0.5.10",
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.42",
