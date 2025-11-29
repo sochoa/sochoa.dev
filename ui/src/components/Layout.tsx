@@ -4,7 +4,7 @@ import Footer from './Footer'
 
 export default function Layout() {
   return (
-    <div className="min-h-screen flex flex-col bg-primary relative">
+    <div className="min-h-screen flex flex-col bg-primary relative font-mono">
       {/* Radial gradient background */}
       <div className="absolute inset-0 pointer-events-none"
         style={{
