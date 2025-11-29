@@ -50,6 +50,7 @@ func NewRouter(
 // Register sets up all routes and returns the configured Gin engine
 func (r *Router) Register() *gin.Engine {
 	// Apply global middleware
+	r.engine.Use(middleware.CORSGin())
 	r.engine.Use(middleware.RecoveryGin(r.log))
 	r.engine.Use(middleware.GinLogger(r.log))
 	r.engine.Use(middleware.GinErrorLogger(r.log))

@@ -1,6 +1,47 @@
+import { useEffect, useState } from 'react'
+import { listPosts } from '@/api'
 import { Link } from '../components/ui'
 
+interface Post {
+  id: string
+  slug: string
+  title: string
+  summary?: string
+  createdAt: string
+  tags?: string[]
+}
+
 export default function Home() {
+  const [posts, setPosts] = useState<Post[]>([])
+  const [postsLoading, setPostsLoading] = useState(true)
+  const [postsError, setPostsError] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchPosts()
+  }, [])
+
+  async function fetchPosts() {
+    try {
+      setPostsLoading(true)
+      const data = await listPosts()
+      setPosts(
+        (data || []).map((post) => ({
+          id: post.id,
+          slug: post.slug,
+          title: post.title,
+          summary: post.summary,
+          createdAt: post.created_at,
+          tags: post.tags,
+        }))
+      )
+    } catch (err) {
+      setPostsError(err instanceof Error ? err.message : 'Failed to load posts')
+    } finally {
+      setPostsLoading(false)
+    }
+  }
+
+  const latestPosts = posts.slice(0, 3)
 
 	const featuredWork = [
 		{
@@ -24,11 +65,6 @@ export default function Home() {
       <section className="mb-12 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
         {/* Left: Text content */}
         <div className="lg:col-span-2">
-          <div className="mb-4">
-            <p className="text-sm font-medium text-accent-purple uppercase tracking-wide">
-              I like building cool $#@!
-            </p>
-          </div>
           <h1 className="
             text-5xl sm:text-6xl lg:text-7xl
             font-bold text-text-primary
@@ -38,7 +74,7 @@ export default function Home() {
           </h1>
           <div className="space-y-1">
             <p className="text-sm sm:text-base text-text-tertiary font-mono tracking-[0.2em] uppercase">
-              engineer • scientist • writer • builder
+              scientist • writer • builder
             </p>
           </div>
         </div>
@@ -107,28 +143,42 @@ export default function Home() {
           Latest Posts
         </h2>
         <div className="space-y-8">
-          {[1, 2, 3].map((item) => (
-            <article
-              key={item}
-              className="pb-8 border-b border-border-subtle/20 last:border-b-0"
-            >
-              <div className="flex items-baseline justify-between gap-4 mb-2">
-                <Link
-                  to={`/blog/post-${item}`}
-                  variant="text"
-                  className="text-xl font-semibold font-mono"
-                >
-                  Blog Post Title {item}
-                </Link>
-                <p className="text-sm text-accent-purple font-medium whitespace-nowrap font-mono">
-                  December {item}, 2024
-                </p>
-              </div>
-              <p className="text-text-secondary text-sm leading-relaxed">
-                A brief excerpt of the blog post to entice readers and showcase the key ideas discussed in the full article...
-              </p>
-            </article>
-          ))}
+          {postsLoading ? (
+            <p className="text-text-secondary">Loading posts...</p>
+          ) : postsError ? (
+            <p className="text-accent-purple">Error loading posts: {postsError}</p>
+          ) : latestPosts.length === 0 ? (
+            <p className="text-text-secondary">No posts yet.</p>
+          ) : (
+            latestPosts.map((post) => (
+              <article
+                key={post.id}
+                className="pb-8 border-b border-border-subtle/20 last:border-b-0"
+              >
+                <div className="flex items-baseline justify-between gap-4 mb-2">
+                  <Link
+                    to={`/blog/${post.slug}`}
+                    variant="text"
+                    className="text-xl font-semibold font-mono"
+                  >
+                    {post.title}
+                  </Link>
+                  <p className="text-sm text-accent-purple font-medium whitespace-nowrap font-mono">
+                    {new Date(post.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </p>
+                </div>
+                {post.summary && (
+                  <p className="text-text-secondary text-sm leading-relaxed">
+                    {post.summary}
+                  </p>
+                )}
+              </article>
+            ))
+          )}
         </div>
         <Link
           to="/blog"
