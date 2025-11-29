@@ -62,7 +62,7 @@ export default function Home() {
   return (
     <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 pt-16 pb-16">
       {/* Hero Section */}
-      <section className="mb-12 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+      <section className="mb-12 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
         {/* Left: Text content */}
         <div className="lg:col-span-2">
           <h1 className="
@@ -77,29 +77,14 @@ export default function Home() {
               scientist • writer • builder
             </p>
           </div>
-        </div>
-
-        <div className="lg:col-span-1 lg:mt-4">
-          <div className="p-6 bg-secondary/50 border border-accent-cyan/20 rounded-xl backdrop-blur-sm">
-            <p className="text-xs font-semibold text-accent-purple uppercase tracking-wide mb-3">
-              Now
-            </p>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm text-text-tertiary">Location</p>
-                <p className="text-text-primary font-medium">Seattle, WA</p>
-              </div>
-              <div>
-                <p className="text-sm text-text-tertiary">Current Focus</p>
-                <p className="text-text-primary font-medium">Security Engineering</p>
-              </div>
-            </div>
-          </div>
+          <p className="mt-4 text-base sm:text-lg text-text-secondary leading-relaxed max-w-3xl">
+            Engineer by craft, scientist because curiosity won’t leave me
+            alone.  I write to understand ideas and to communicate clearly
+            with others.  I build secure, resilient systems that help people
+            navigate complexity.
+          </p>
         </div>
       </section>
-
-      {/* Section separator */}
-      <div className="h-px bg-border-subtle/20 mb-12" />
 
       {/* Featured Work */}
       <section className="mb-12">
@@ -180,13 +165,15 @@ export default function Home() {
             ))
           )}
         </div>
-        <Link
-          to="/blog"
-          variant="accent"
-          className="inline-block mt-12 text-sm font-medium"
-        >
-          View all posts →
-        </Link>
+        {posts.length > 3 && (
+          <Link
+            to="/blog"
+            variant="accent"
+            className="inline-block mt-12 text-sm font-medium"
+          >
+            View all posts →
+          </Link>
+        )}
       </section>
     </div>
   )
