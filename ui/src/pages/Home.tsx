@@ -1,26 +1,48 @@
-import { Link } from 'react-router-dom'
+import { Link } from '../components/ui'
 
 export default function Home() {
+
+	const featuredWork = [
+		{
+			title: 'Security Risk & Remediation Program',
+			description:
+				'Designed and implemented a security program to track and prioritize CVEs, application security issues, cloud misconfigurations, and network vulnerabilities across 2,500+ hosts and 340+ sites, driving SLA-compliant remediation at scale.',
+			href: '#', // TODO: link to case study or /work/security-program
+		},
+		{
+			title: 'Network Policy Risk Ranking Service',
+			description:
+				'Built a network security service to analyze and rank the risk of network policies across large cloud environments, helping teams identify high-risk exposure, standardize configurations, and strengthen their overall security posture.',
+			href: '#', // TODO: link to case study or /work/network-policy-risk
+		},
+	]
+
+
   return (
-    <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-20 sm:py-32">
+    <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 pt-16 pb-16">
       {/* Hero Section */}
-      <section className="mb-32 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
+      <section className="mb-12 grid grid-cols-1 lg:grid-cols-3 gap-12 items-start">
         {/* Left: Text content */}
         <div className="lg:col-span-2">
           <div className="mb-4">
             <p className="text-sm font-medium text-accent-purple uppercase tracking-wide">
-              Full-stack developer
+              I like building cool $#@!
             </p>
           </div>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-text-primary mb-6 leading-tight">
-            Hey, I'm sochoa
+          <h1 className="
+            text-5xl sm:text-6xl lg:text-7xl
+            font-bold text-text-primary
+            mb-3 leading-none tracking-tight
+          ">
+            Sean Ochoa
           </h1>
-          <p className="text-lg text-text-secondary mb-8 max-w-xl leading-relaxed">
-            Software engineer, writer, and builder. I create things that matter—from elegant code to thoughtful experiences.
-          </p>
+          <div className="space-y-1">
+            <p className="text-sm sm:text-base text-text-tertiary font-mono tracking-[0.2em] uppercase">
+              engineer • scientist • writer • builder
+            </p>
+          </div>
         </div>
 
-        {/* Right: Now card */}
         <div className="lg:col-span-1 lg:mt-4">
           <div className="p-6 bg-secondary/50 border border-accent-cyan/20 rounded-xl backdrop-blur-sm">
             <p className="text-xs font-semibold text-accent-purple uppercase tracking-wide mb-3">
@@ -29,15 +51,11 @@ export default function Home() {
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-text-tertiary">Location</p>
-                <p className="text-text-primary font-medium">San Francisco, CA</p>
+                <p className="text-text-primary font-medium">Seattle, WA</p>
               </div>
               <div>
-                <p className="text-sm text-text-tertiary">Focus</p>
-                <p className="text-text-primary font-medium">Building in public</p>
-              </div>
-              <div>
-                <p className="text-sm text-text-tertiary">Status</p>
-                <p className="text-text-primary font-medium">Open to collab</p>
+                <p className="text-sm text-text-tertiary">Current Focus</p>
+                <p className="text-text-primary font-medium">Security Engineering</p>
               </div>
             </div>
           </div>
@@ -45,49 +63,38 @@ export default function Home() {
       </section>
 
       {/* Section separator */}
-      <div className="h-px bg-border-subtle/20 mb-32" />
+      <div className="h-px bg-border-subtle/20 mb-12" />
 
       {/* Featured Work */}
-      <section className="mb-32">
+      <section className="mb-12">
         <div className="flex justify-between items-baseline mb-12">
-          <h2 className="text-3xl font-bold text-accent-purple">
+          <h2 className="text-3xl font-bold text-accent-purple font-mono">
             Featured Work
           </h2>
-          <Link
-            to="/work"
-            className="text-accent-cyan hover:text-text-primary focus-visible-ring rounded text-sm transition-colors"
-          >
-            View all →
-          </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {[1, 2].map((item) => (
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {featuredWork.map((project) => (
             <div
-              key={item}
+              key={project.title}
               className="group relative bg-secondary/40 border border-accent-cyan/20 rounded-2xl p-8 transition-all duration-300 hover:border-accent-cyan/50"
               style={{
                 boxShadow: '0 0 20px rgba(0, 217, 255, 0.05)',
               }}
             >
-              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              <div
+                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 style={{
                   boxShadow: 'inset 0 0 20px rgba(0, 217, 255, 0.1)',
                   pointerEvents: 'none',
                 }}
               />
               <div className="relative z-10">
-                <h3 className="text-xl font-semibold text-text-primary mb-3 group-hover:text-accent-cyan transition-colors">
-                  Project {item}
+                <h3 className="text-xl font-semibold text-text-primary mb-3 group-hover:text-accent-cyan transition-colors font-mono">
+                  {project.title}
                 </h3>
                 <p className="text-text-secondary mb-6 text-sm leading-relaxed">
-                  Description of the project and the impact it made.
+                  {project.description}
                 </p>
-                <a
-                  href="#"
-                  className="text-accent-cyan hover:text-text-primary focus-visible-ring rounded text-sm transition-colors inline-block"
-                >
-                  Learn more →
-                </a>
               </div>
             </div>
           ))}
@@ -96,7 +103,7 @@ export default function Home() {
 
       {/* Latest Posts */}
       <section>
-        <h2 className="text-3xl font-bold text-accent-purple mb-12">
+        <h2 className="text-3xl font-bold text-accent-purple mb-12 font-mono">
           Latest Posts
         </h2>
         <div className="space-y-8">
@@ -108,11 +115,12 @@ export default function Home() {
               <div className="flex items-baseline justify-between gap-4 mb-2">
                 <Link
                   to={`/blog/post-${item}`}
-                  className="text-xl font-semibold text-text-primary hover:text-accent-cyan focus-visible-ring rounded transition-colors"
+                  variant="text"
+                  className="text-xl font-semibold font-mono"
                 >
                   Blog Post Title {item}
                 </Link>
-                <p className="text-sm text-accent-purple font-medium whitespace-nowrap">
+                <p className="text-sm text-accent-purple font-medium whitespace-nowrap font-mono">
                   December {item}, 2024
                 </p>
               </div>
@@ -124,7 +132,8 @@ export default function Home() {
         </div>
         <Link
           to="/blog"
-          className="inline-block mt-12 text-accent-cyan hover:text-accent-teal focus-visible-ring rounded text-sm transition-colors font-medium"
+          variant="accent"
+          className="inline-block mt-12 text-sm font-medium"
         >
           View all posts →
         </Link>

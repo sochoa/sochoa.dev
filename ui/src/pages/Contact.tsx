@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { submitContact } from '@/api'
+import { PageContainer, PageHeader, Section, Card, Button, Input, Textarea, Alert } from '../components/ui'
 
 interface FormData {
   name: string
@@ -102,110 +103,67 @@ export default function Contact() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-      <h1 className="text-4xl font-bold text-text-primary mb-4">
-        Get in Touch
-      </h1>
-      <p className="text-lg text-text-secondary mb-12">
-        Have a question or want to work together? Send me a message.
-      </p>
+    <PageContainer>
+      <PageHeader
+        title="Get in Touch"
+        subtitle="Have a question or want to work together? Send me a message."
+      />
 
-      {state.submitted && (
-        <div className="bg-secondary border border-border-accent rounded p-6 mb-8 shadow-subtle">
-          <p className="text-accent-teal">
-            [OK] Thank you! I'll get back to you soon.
-          </p>
-        </div>
-      )}
+      <Section>
+        <Card>
+          {state.submitted && <Alert type="success">Thank you! I'll get back to you soon.</Alert>}
+          {state.error && <Alert type="error">Error: {state.error}</Alert>}
 
-      {state.error && (
-        <div className="bg-secondary border border-accent-magenta rounded p-6 mb-8 shadow-subtle">
-          <p className="text-accent-magenta">Error: {state.error}</p>
-        </div>
-      )}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              type="text"
+              id="name"
+              name="name"
+              label="Name"
+              value={state.data.name}
+              onChange={handleChange}
+              disabled={state.isSubmitting}
+              error={state.errors.name}
+            />
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Name */}
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-2">
-            Name
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={state.data.name}
-            onChange={handleChange}
-            disabled={state.isSubmitting}
-            className="w-full px-4 py-2 border border-border-subtle bg-secondary text-text-primary rounded focus-visible-ring disabled:opacity-50 disabled:cursor-not-allowed hover:border-border-accent transition-colors"
-            aria-invalid={!!state.errors.name}
-            aria-describedby={state.errors.name ? 'name-error' : undefined}
-          />
-          {state.errors.name && (
-            <p id="name-error" className="text-accent-magenta text-sm mt-2">
-              {state.errors.name}
-            </p>
-          )}
-        </div>
+            <Input
+              type="email"
+              id="email"
+              name="email"
+              label="Email"
+              value={state.data.email}
+              onChange={handleChange}
+              disabled={state.isSubmitting}
+              error={state.errors.email}
+            />
 
-        {/* Email */}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={state.data.email}
-            onChange={handleChange}
-            disabled={state.isSubmitting}
-            className="w-full px-4 py-2 border border-border-subtle bg-secondary text-text-primary rounded focus-visible-ring disabled:opacity-50 disabled:cursor-not-allowed hover:border-border-accent transition-colors"
-            aria-invalid={!!state.errors.email}
-            aria-describedby={state.errors.email ? 'email-error' : undefined}
-          />
-          {state.errors.email && (
-            <p id="email-error" className="text-accent-magenta text-sm mt-2">
-              {state.errors.email}
-            </p>
-          )}
-        </div>
+            <div>
+              <Textarea
+                id="message"
+                name="message"
+                label="Message"
+                value={state.data.message}
+                onChange={handleChange}
+                disabled={state.isSubmitting}
+                rows={6}
+                error={state.errors.message}
+              />
+              <p className="text-xs text-text-tertiary mt-2">
+                {state.data.message.length} / 5000
+              </p>
+            </div>
 
-        {/* Message */}
-        <div>
-          <label htmlFor="message" className="block text-sm font-medium text-text-primary mb-2">
-            Message
-          </label>
-          <textarea
-            id="message"
-            name="message"
-            value={state.data.message}
-            onChange={handleChange}
-            disabled={state.isSubmitting}
-            rows={6}
-            className="w-full px-4 py-2 border border-border-subtle bg-secondary text-text-primary rounded focus-visible-ring disabled:opacity-50 disabled:cursor-not-allowed hover:border-border-accent transition-colors resize-none"
-            aria-invalid={!!state.errors.message}
-            aria-describedby={state.errors.message ? 'message-error' : undefined}
-          />
-          {state.errors.message && (
-            <p id="message-error" className="text-accent-magenta text-sm mt-2">
-              {state.errors.message}
-            </p>
-          )}
-          <p className="text-xs text-text-tertiary mt-2">
-            {state.data.message.length} / 5000
-          </p>
-        </div>
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={state.isSubmitting}
-          className="w-full px-6 py-3 bg-accent-cyan text-primary font-medium rounded border border-accent-cyan hover:bg-transparent hover:text-accent-cyan disabled:opacity-50 disabled:cursor-not-allowed focus-visible-ring transition-all"
-        >
-          {state.isSubmitting ? 'Sending...' : 'Send Message'}
-        </button>
-      </form>
-    </div>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={state.isSubmitting}
+              className="w-full"
+            >
+              {state.isSubmitting ? 'Sending...' : 'Send Message'}
+            </Button>
+          </form>
+        </Card>
+      </Section>
+    </PageContainer>
   )
 }

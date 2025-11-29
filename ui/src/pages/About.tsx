@@ -3,22 +3,25 @@ import { PageContainer, Section, Card, Tag } from '../components/ui'
 export default function About() {
   const timeline = [
     {
-      year: '2023',
-      title: 'Senior Software Engineer',
-      company: 'Tech Company',
-      description: 'Led development of core platform features, mentored junior engineers.',
+      year: '2025',
+      title: 'Senior Systems Engineer',
+      company: 'Global Cloud Infrastructure Company',
+      description:
+        'Focused on large-scale systems reliability, security workflows, and infrastructure automation across hundreds of technical sites.',
     },
     {
       year: '2021',
-      title: 'Full Stack Developer',
-      company: 'StartUp Inc',
-      description: 'Built and shipped customer-facing products, improved system performance.',
+      title: 'Lead Software Engineer',
+      company: 'Enterprise Software Platform Provider',
+      description:
+        'Designed and delivered distributed deployment systems, improved CI/CD workflows, and provided technical mentorship across engineering teams.',
     },
     {
-      year: '2019',
-      title: 'Software Engineer',
-      company: 'Early Stage Startup',
-      description: 'Contributed to product development across frontend and backend.',
+      year: '2017',
+      title: 'Principal Engineer',
+      company: 'Global Cloud Services Provider',
+      description:
+        'Built access control, security, and orchestration services used across large-scale cloud environments, and led compliance and automation initiatives.',
     },
   ]
 
@@ -26,7 +29,7 @@ export default function About() {
     { category: 'Backend', skills: ['Go', 'Node.js', 'Python', 'PostgreSQL', 'Redis'] },
     { category: 'Frontend', skills: ['React', 'TypeScript', 'TailwindCSS', 'Next.js'] },
     { category: 'Infrastructure', skills: ['AWS', 'Docker', 'Kubernetes', 'CI/CD'] },
-    { category: 'Specialties', skills: ['System Design', 'Performance Optimization', 'Mentoring'] },
+    { category: 'Specialties', skills: ['System Design', 'Performance Optimization', 'Security Engineering', 'Mentoring'] },
   ]
 
   return (
@@ -34,31 +37,24 @@ export default function About() {
       {/* Hero Section */}
       <section className="mb-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-          {/* Headshot Placeholder */}
-          <div className="md:col-span-1">
-            <div className="w-48 h-48 mx-auto bg-gradient-to-br from-accent-cyan to-accent-purple rounded-lg flex items-center justify-center">
-              <span className="text-text-primary text-6xl">👤</span>
-            </div>
-          </div>
 
           {/* Bio */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-4">
             <h1 className="text-4xl font-bold text-accent-purple mb-4 font-mono">
               About Me
             </h1>
             <p className="text-lg text-text-secondary mb-4">
-              Hi! I'm a software engineer with a passion for building things that matter.
-              I specialize in full-stack development, system design, and helping teams ship
-              great products.
+                Hi! I'm an experienced engineer and I love designing and building secure and performant systems.  My work spans
+                distributed backend services, infrastructure automation, cloud native systems, security infrastructure, and developer
+                tooling that helps teams move faster and safer.
             </p>
             <p className="text-lg text-text-secondary mb-4">
-              When I'm not coding, you'll find me writing about technology, mentoring junior
-              developers, or exploring new ideas. I believe in clean code, good documentation,
-              and making technology accessible to everyone.
+              When I'm not building or designing, you'll find me writing, mentoring junior
+              developers, or exploring new ideas. I believe in clean self-documenting code,
+              automated security validation, and enabling my team to do less manual $#@$.
             </p>
             <p className="text-lg text-text-secondary">
-              Currently focused on building scalable systems and contributing to open source
-              projects that make a real difference.
+              Currently focused on building scalable systems at Amazon Web Services.
             </p>
           </div>
         </div>
@@ -69,20 +65,18 @@ export default function About() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <h3 className="text-lg font-semibold text-text-primary mb-2 font-mono">
-              Quality
+              Reliability with Integrity
             </h3>
             <p className="text-text-secondary">
-              I believe in writing code that's not just functional, but also maintainable,
-              tested, and well-documented.
+                I build systems and make decisions that people can trust, especially when accuracy, safety, and uptime matter most.
             </p>
           </Card>
           <Card>
             <h3 className="text-lg font-semibold text-text-primary mb-2 font-mono">
-              Collaboration
+              Craftsmanship that Serves People
             </h3>
             <p className="text-text-secondary">
-              The best solutions come from diverse perspectives. I thrive in collaborative
-              environments where ideas are shared openly.
+                I focus on thoughtful engineering—clear, maintainable, and elegant—so the teams and operators who rely on my work can do theirs with confidence.
             </p>
           </Card>
           <Card>
@@ -90,8 +84,7 @@ export default function About() {
               Impact
             </h3>
             <p className="text-text-secondary">
-              I focus on building solutions that solve real problems and create tangible
-              value for users and businesses.
+                I choose work that creates real, measurable change.  I improve systems, elevating teams, or advancing technology in measurable ways that impact the business.
             </p>
           </Card>
         </div>

@@ -1,6 +1,7 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { getPostBySlug } from '@/api'
+import { PageContainer, PageHeader, Alert, Link, Tag } from '../components/ui'
 
 interface Post {
   id: string
@@ -48,48 +49,35 @@ export default function BlogPost() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <p className="text-slate-600 dark:text-slate-300">Loading post...</p>
-      </div>
+      <PageContainer>
+        <p className="text-text-secondary">Loading post...</p>
+      </PageContainer>
     )
   }
 
   if (error || !post) {
     return (
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-8">
-          <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
-            Error
-          </h2>
-          <p className="text-red-700 dark:text-red-300 mb-4">
-            {error || 'Post not found'}
-          </p>
-        </div>
-        <Link
-          to="/blog"
-          className="text-blue-600 dark:text-blue-400 hover:underline focus-visible-ring rounded"
-        >
+      <PageContainer>
+        <Alert type="error">{error || 'Post not found'}</Alert>
+        <Link to="/blog" variant="text">
           ← Back to blog
         </Link>
-      </div>
+      </PageContainer>
     )
   }
 
   return (
-    <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <PageContainer>
       {/* Navigation */}
-      <Link
-        to="/blog"
-        className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline focus-visible-ring rounded mb-8"
-      >
+      <Link to="/blog" variant="text" className="mb-8 inline-block">
         ← Back to blog
       </Link>
 
       {/* Header */}
-      <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-        {post.title}
-      </h1>
-      <p className="text-lg text-slate-500 dark:text-slate-400 mb-8">
+      <PageHeader title={post.title} />
+
+      {/* Date */}
+      <p className="text-lg text-accent-purple mb-8 font-mono">
         {new Date(post.createdAt).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
@@ -99,24 +87,19 @@ export default function BlogPost() {
 
       {/* Tags */}
       {post.tags && post.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-8 pb-8 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex flex-wrap gap-2 mb-8 pb-8 border-b border-border-subtle/20">
           {post.tags.map((tag) => (
-            <span
-              key={tag}
-              className="text-sm px-3 py-1 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 rounded-full"
-            >
-              {tag}
-            </span>
+            <Tag key={tag}>{tag}</Tag>
           ))}
         </div>
       )}
 
       {/* Content */}
       <div className="prose dark:prose-invert max-w-none">
-        <div className="whitespace-pre-wrap text-slate-700 dark:text-slate-300 leading-relaxed">
+        <div className="whitespace-pre-wrap text-text-secondary leading-relaxed">
           {post.body}
         </div>
       </div>
-    </article>
+    </PageContainer>
   )
 }

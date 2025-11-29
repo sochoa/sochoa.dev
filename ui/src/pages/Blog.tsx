@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { listPosts } from '@/api'
+import { PageContainer, PageHeader, Alert, Link, Tag, Button } from '../components/ui'
 
 interface Post {
   id: string
@@ -47,16 +47,10 @@ export default function Blog() {
     : posts
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-      <h1 className="text-4xl font-bold text-accent-purple mb-8">
-        Blog
-      </h1>
+    <PageContainer>
+      <PageHeader title="Blog" />
 
-      {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-8">
-          <p className="text-red-800 dark:text-red-200">Error: {error}</p>
-        </div>
-      )}
+      {error && <Alert type="error">Error: {error}</Alert>}
 
       {loading ? (
         <div className="text-center py-12">
@@ -72,30 +66,24 @@ export default function Blog() {
           {posts.some((p) => p.tags?.length) && (
             <div className="mb-8">
               <div className="flex flex-wrap gap-2">
-                <button
+                <Button
+                  variant={selectedTag === null ? 'primary' : 'secondary'}
                   onClick={() => setSelectedTag(null)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    selectedTag === null
-                      ? 'bg-accent-cyan text-primary'
-                      : 'bg-secondary text-text-primary hover:bg-tertiary'
-                  } focus-visible-ring`}
+                  className="text-sm px-4 py-2"
                 >
                   All
-                </button>
+                </Button>
                 {Array.from(
                   new Set(posts.flatMap((p) => p.tags || []))
                 ).map((tag) => (
-                  <button
+                  <Button
                     key={tag}
+                    variant={selectedTag === tag ? 'primary' : 'secondary'}
                     onClick={() => setSelectedTag(tag)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedTag === tag
-                        ? 'bg-accent-cyan text-primary'
-                        : 'bg-secondary text-text-primary hover:bg-tertiary'
-                    } focus-visible-ring`}
+                    className="text-sm px-4 py-2"
                   >
                     {tag}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -111,12 +99,13 @@ export default function Blog() {
                 <Link
                   to={`/blog/${post.slug}`}
                   className="group block"
+                  variant="text"
                 >
-                  <h2 className="text-2xl font-semibold text-accent-purple group-hover:text-accent-cyan transition-colors mb-2">
+                  <h2 className="text-2xl font-semibold text-accent-purple group-hover:text-accent-cyan transition-colors mb-2 font-mono">
                     {post.title}
                   </h2>
                 </Link>
-                <p className="text-sm text-accent-purple mb-3">
+                <p className="text-sm text-accent-purple mb-3 font-mono">
                   {new Date(post.createdAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
@@ -129,18 +118,14 @@ export default function Blog() {
                 {post.tags && post.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {post.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs px-3 py-1 bg-secondary text-text-secondary rounded-full"
-                      >
-                        {tag}
-                      </span>
+                      <Tag key={tag}>{tag}</Tag>
                     ))}
                   </div>
                 )}
                 <Link
                   to={`/blog/${post.slug}`}
-                  className="inline-block mt-4 text-accent-cyan hover:text-accent-cyan focus-visible-ring rounded transition-colors"
+                  variant="accent"
+                  className="inline-block mt-4"
                 >
                   Read more →
                 </Link>
@@ -149,6 +134,6 @@ export default function Blog() {
           </div>
         </>
       )}
-    </div>
+    </PageContainer>
   )
 }

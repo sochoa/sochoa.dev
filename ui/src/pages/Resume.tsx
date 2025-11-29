@@ -1,3 +1,5 @@
+import { PageContainer, Button, Tag, Section, Card } from '../components/ui'
+
 export default function Resume() {
   const experience = [
     {
@@ -106,36 +108,30 @@ export default function Resume() {
   ]
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <PageContainer>
       {/* Header with Download Link */}
       <div className="flex justify-between items-start mb-12">
         <div>
-          <h1 className="text-4xl font-bold text-accent-purple mb-2">
+          <h1 className="text-4xl font-bold text-accent-purple mb-2 font-mono">
             Resume
           </h1>
           <p className="text-lg text-text-secondary">
             Infrastructure engineer with 10+ years building secure, scalable systems at scale
           </p>
         </div>
-        <a
-          href="#"
-          className="px-6 py-3 bg-accent-cyan text-primary rounded-lg hover:bg-accent-cyan/90 focus-visible-ring font-medium transition-colors whitespace-nowrap"
+        <Button
+          variant="primary"
+          className="whitespace-nowrap"
         >
           Download PDF
-        </a>
+        </Button>
       </div>
 
       {/* Experience Section */}
-      <section className="mb-12">
-        <h2 className="text-3xl font-bold text-accent-purple mb-12">
-          Experience
-        </h2>
+      <Section title="Experience" spacing="normal">
         <div className="space-y-8">
           {experience.map((job, index) => (
-            <div
-              key={index}
-              className="border border-border-subtle/20 bg-secondary/30 rounded-lg p-6"
-            >
+            <Card key={index}>
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-xl font-semibold text-text-primary">
@@ -160,63 +156,49 @@ export default function Resume() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </Card>
           ))}
         </div>
-      </section>
+      </Section>
 
       {/* Skills Section */}
-      <section className="mb-12 pt-12 border-t border-border-subtle/20">
-        <h2 className="text-3xl font-bold text-accent-purple mb-12">
-          Skills
-        </h2>
+      <Section title="Skills" spacing="normal">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {skills.map((skillGroup) => (
             <div key={skillGroup.category}>
-              <h3 className="text-lg font-semibold text-text-primary mb-4">
+              <h3 className="text-lg font-semibold text-text-primary mb-4 font-mono">
                 {skillGroup.category}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {skillGroup.items.map((skill) => (
-                  <span
-                    key={skill}
-                    className="px-3 py-1 bg-secondary/50 border border-accent-cyan/20 text-text-secondary rounded-full text-sm font-medium"
-                  >
-                    {skill}
-                  </span>
+                  <Tag key={skill}>{skill}</Tag>
                 ))}
               </div>
             </div>
           ))}
         </div>
-      </section>
+      </Section>
 
       {/* Education Section */}
-      <section className="pt-12 border-t border-border-subtle/20">
-        <h2 className="text-3xl font-bold text-accent-purple mb-12">
-          Education
-        </h2>
+      <Section title="Education" spacing="normal">
         <div className="space-y-4">
           {education.map((edu, index) => (
-            <div
-              key={index}
-              className="border border-border-subtle/20 bg-secondary/30 rounded-lg p-6"
-            >
+            <Card key={index}>
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-lg font-semibold text-text-primary">
+                  <h3 className="text-lg font-semibold text-text-primary font-mono">
                     {edu.degree}
                   </h3>
                   <p className="text-text-secondary text-sm">{edu.school}</p>
                 </div>
-                <span className="text-sm font-medium text-accent-purple">
+                <span className="text-sm font-medium text-accent-purple font-mono">
                   {edu.year}
                 </span>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
-      </section>
-    </div>
+      </Section>
+    </PageContainer>
   )
 }
