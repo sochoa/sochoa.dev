@@ -11,32 +11,6 @@ export default function Home() {
         <p className="text-lg text-text-secondary mb-8 max-w-2xl leading-relaxed">
           Software engineer, writer, and builder. I create things that matter.
         </p>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            to="/about"
-            className="inline-block px-6 py-2 bg-accent-cyan text-primary font-medium rounded border border-accent-cyan hover:bg-transparent hover:text-accent-cyan focus-visible-ring transition-all"
-          >
-            About Me
-          </Link>
-          <Link
-            to="/work"
-            className="inline-block px-6 py-2 border border-border-subtle text-text-primary rounded hover:border-border-accent hover:text-accent-cyan focus-visible-ring transition-colors"
-          >
-            View Work
-          </Link>
-          <Link
-            to="/blog"
-            className="inline-block px-6 py-2 border border-border-subtle text-text-primary rounded hover:border-border-accent hover:text-accent-cyan focus-visible-ring transition-colors"
-          >
-            Read Blog
-          </Link>
-          <Link
-            to="/contact"
-            className="inline-block px-6 py-2 border border-border-subtle text-text-primary rounded hover:border-border-accent hover:text-accent-cyan focus-visible-ring transition-colors"
-          >
-            Get in Touch
-          </Link>
-        </div>
       </section>
 
       {/* Featured Work */}
