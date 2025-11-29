@@ -11,12 +11,12 @@ const AVAILABLE_THEMES = [
 ]
 
 export function useTheme() {
-  const [theme, setTheme] = useState<string>('dark')
+  const [theme, setTheme] = useState<string>('dracula')
 
   useEffect(() => {
-    // Check if user has a saved preference
+    // Check if user has a saved preference, default to dracula
     const saved = localStorage.getItem('daisyui-theme')
-    const initialTheme = saved && AVAILABLE_THEMES.includes(saved) ? saved : 'dark'
+    const initialTheme = saved && AVAILABLE_THEMES.includes(saved) ? saved : 'dracula'
     setTheme(initialTheme)
     applyTheme(initialTheme)
   }, [])

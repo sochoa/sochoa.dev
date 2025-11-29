@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
-import ThemeSelector from './ThemeSelector'
 
 export default function Header() {
   const user = useAuthStore((s) => s.user)
@@ -75,9 +74,6 @@ export default function Header() {
               Sign in
             </Link>
           )}
-
-          {/* Theme Selector Combobox */}
-          <ThemeSelector />
         </div>
       </nav>
     </header>
