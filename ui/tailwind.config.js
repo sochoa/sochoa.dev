@@ -49,9 +49,11 @@ export default {
         tertiary: 'hsl(var(--b3) / <alpha-value>)',
         accent: {
           // Primary accent: cyan for links, hovers, interactive elements
-          cyan: 'hsl(var(--a) / <alpha-value>)',
+          // Uses custom CSS variable set by palette system
+          cyan: 'var(--accent-cyan)',
           // Secondary accent: purple for headings and metadata (used sparingly)
-          purple: '#bb86fc',
+          // Uses custom CSS variable set by palette system
+          purple: 'var(--accent-purple)',
         },
         text: {
           primary: 'hsl(var(--bc) / <alpha-value>)',
@@ -60,7 +62,7 @@ export default {
         },
         border: {
           subtle: 'hsl(var(--b2) / <alpha-value>)',
-          accent: 'hsl(var(--a) / <alpha-value>)',
+          accent: 'var(--accent-cyan)',
         },
       },
       borderRadius: {

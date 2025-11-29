@@ -5,6 +5,10 @@
 @layer base {
   :root {
     color-scheme: dark;
+    /* Default color palette variables (Cyan) */
+    /* These are overridden by the palette switcher */
+    --accent-cyan: #00d9ff;
+    --accent-purple: #bb86fc;
   }
 
   * {
