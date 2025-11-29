@@ -11,7 +11,7 @@ export interface ApiGatewayConstructProps {
   uiDomain: string;
 }
 
-export class ApiGatewayConstructConstruct extends Construct {
+export class ApiGatewayConstruct extends Construct {
   public readonly api: apigatewayv2.HttpApi;
   public readonly apiUrl: string;
 
