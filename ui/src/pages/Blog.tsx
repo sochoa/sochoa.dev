@@ -48,7 +48,7 @@ export default function Blog() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-      <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-8">
+      <h1 className="text-4xl font-bold text-accent-purple mb-8">
         Blog
       </h1>
 
@@ -60,11 +60,11 @@ export default function Blog() {
 
       {loading ? (
         <div className="text-center py-12">
-          <p className="text-slate-600 dark:text-slate-300">Loading posts...</p>
+          <p className="text-text-secondary">Loading posts...</p>
         </div>
       ) : posts.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-slate-600 dark:text-slate-300">No posts yet.</p>
+          <p className="text-text-secondary">No posts yet.</p>
         </div>
       ) : (
         <>
@@ -76,8 +76,8 @@ export default function Blog() {
                   onClick={() => setSelectedTag(null)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                     selectedTag === null
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700'
+                      ? 'bg-accent-cyan text-primary'
+                      : 'bg-secondary text-text-primary hover:bg-tertiary'
                   } focus-visible-ring`}
                 >
                   All
@@ -90,8 +90,8 @@ export default function Blog() {
                     onClick={() => setSelectedTag(tag)}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                       selectedTag === tag
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700'
+                        ? 'bg-accent-cyan text-primary'
+                        : 'bg-secondary text-text-primary hover:bg-tertiary'
                     } focus-visible-ring`}
                   >
                     {tag}
@@ -106,24 +106,24 @@ export default function Blog() {
             {filteredPosts.map((post) => (
               <article
                 key={post.id}
-                className="border-b border-slate-200 dark:border-slate-800 pb-8 last:border-b-0"
+                className="border-b border-border-subtle pb-8 last:border-b-0"
               >
                 <Link
                   to={`/blog/${post.slug}`}
                   className="group block"
                 >
-                  <h2 className="text-2xl font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
+                  <h2 className="text-2xl font-semibold text-accent-purple group-hover:text-accent-cyan transition-colors mb-2">
                     {post.title}
                   </h2>
                 </Link>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+                <p className="text-sm text-accent-purple mb-3">
                   {new Date(post.createdAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
                   })}
                 </p>
-                <p className="text-slate-600 dark:text-slate-300 mb-4">
+                <p className="text-text-secondary mb-4">
                   {post.summary}
                 </p>
                 {post.tags && post.tags.length > 0 && (
@@ -131,7 +131,7 @@ export default function Blog() {
                     {post.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-xs px-3 py-1 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 rounded-full"
+                        className="text-xs px-3 py-1 bg-secondary text-text-secondary rounded-full"
                       >
                         {tag}
                       </span>
@@ -140,7 +140,7 @@ export default function Blog() {
                 )}
                 <Link
                   to={`/blog/${post.slug}`}
-                  className="inline-block mt-4 text-blue-600 dark:text-blue-400 hover:underline focus-visible-ring rounded"
+                  className="inline-block mt-4 text-accent-cyan hover:text-accent-cyan focus-visible-ring rounded transition-colors"
                 >
                   Read more →
                 </Link>

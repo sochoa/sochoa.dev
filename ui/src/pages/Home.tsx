@@ -16,12 +16,12 @@ export default function Home() {
       {/* Featured Work */}
       <section className="mb-20">
         <div className="flex justify-between items-baseline mb-8">
-          <h2 className="text-2xl font-bold text-text-primary">
+          <h2 className="text-2xl font-bold text-accent-purple">
             Featured Work
           </h2>
           <Link
             to="/work"
-            className="text-accent-cyan hover:text-accent-teal focus-visible-ring rounded text-sm transition-colors"
+            className="text-accent-cyan hover:text-accent-cyan focus-visible-ring rounded text-sm transition-colors"
           >
             View all →
           </Link>
@@ -51,7 +51,7 @@ export default function Home() {
 
       {/* Latest Posts */}
       <section>
-        <h2 className="text-2xl font-bold text-text-primary mb-8">
+        <h2 className="text-2xl font-bold text-accent-purple mb-8">
           Latest Posts
         </h2>
         <div className="space-y-6">
@@ -66,7 +66,7 @@ export default function Home() {
               >
                 Blog Post Title {item}
               </Link>
-              <p className="text-xs text-text-tertiary mt-2">
+              <p className="text-xs text-accent-purple mt-2">
                 December {item}, 2024
               </p>
               <p className="text-text-secondary mt-3 text-sm">

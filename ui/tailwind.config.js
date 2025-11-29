@@ -48,9 +48,10 @@ export default {
         secondary: 'hsl(var(--s) / <alpha-value>)',
         tertiary: 'hsl(var(--b3) / <alpha-value>)',
         accent: {
+          // Primary accent: cyan for links, hovers, interactive elements
           cyan: 'hsl(var(--a) / <alpha-value>)',
-          teal: '#00ffd1', // Custom color, not in DaisyUI
-          magenta: '#ff006e', // Custom color, not in DaisyUI
+          // Secondary accent: purple for headings and metadata (used sparingly)
+          purple: '#bb86fc',
         },
         text: {
           primary: 'hsl(var(--bc) / <alpha-value>)',
