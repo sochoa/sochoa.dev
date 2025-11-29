@@ -40,10 +40,12 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Focus styles for accessibility - subtle glow on dark background */
+/* Focus styles for accessibility - uses theme colors */
 @layer utilities {
   .focus-visible-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-primary;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+    --tw-ring-color: hsl(var(--a));
+    --tw-ring-offset-color: hsl(var(--p));
   }
 
   /* Subtle shadow for depth */

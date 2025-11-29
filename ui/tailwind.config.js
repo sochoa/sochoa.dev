@@ -42,22 +42,24 @@ export default {
         ],
       },
       colors: {
-        primary: '#0a0e27',
-        secondary: '#1a1f3a',
-        tertiary: '#242d47',
+        // Use DaisyUI CSS variables for theme-aware colors
+        // These automatically update when data-theme changes
+        primary: 'hsl(var(--p) / <alpha-value>)',
+        secondary: 'hsl(var(--s) / <alpha-value>)',
+        tertiary: 'hsl(var(--b3) / <alpha-value>)',
         accent: {
-          cyan: '#00d9ff',
-          teal: '#00ffd1',
-          magenta: '#ff006e',
+          cyan: 'hsl(var(--a) / <alpha-value>)',
+          teal: '#00ffd1', // Custom color, not in DaisyUI
+          magenta: '#ff006e', // Custom color, not in DaisyUI
         },
         text: {
-          primary: '#e8ecf1',
-          secondary: '#8892a6',
-          tertiary: '#5a6578',
+          primary: 'hsl(var(--bc) / <alpha-value>)',
+          secondary: 'hsl(var(--bc) / 0.7)',
+          tertiary: 'hsl(var(--bc) / 0.5)',
         },
         border: {
-          subtle: '#2d3748',
-          accent: '#00d9ff',
+          subtle: 'hsl(var(--b2) / <alpha-value>)',
+          accent: 'hsl(var(--a) / <alpha-value>)',
         },
       },
       borderRadius: {
@@ -70,33 +72,34 @@ export default {
       typography: {
         DEFAULT: {
           css: {
-            color: '#e8ecf1',
+            // Use CSS variables so typography changes with theme
+            color: 'hsl(var(--bc))',
             backgroundColor: 'transparent',
             'h1, h2, h3, h4, h5, h6': {
-              color: '#e8ecf1',
+              color: 'hsl(var(--bc))',
               fontFamily:
                 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
             },
             'a': {
-              color: '#00d9ff',
+              color: 'hsl(var(--a))',
               '&:hover': {
-                color: '#00ffd1',
+                color: '#00ffd1', // Teal accent on hover
               },
             },
             'code': {
-              color: '#00d9ff',
-              backgroundColor: '#1a1f3a',
+              color: 'hsl(var(--a))',
+              backgroundColor: 'hsl(var(--b2))',
               padding: '2px 6px',
               borderRadius: '4px',
             },
             'pre': {
-              backgroundColor: '#1a1f3a',
-              color: '#e8ecf1',
+              backgroundColor: 'hsl(var(--b2))',
+              color: 'hsl(var(--bc))',
               borderRadius: '4px',
             },
             'blockquote': {
-              color: '#8892a6',
-              borderLeftColor: '#00d9ff',
+              color: 'hsl(var(--bc) / 0.7)',
+              borderLeftColor: 'hsl(var(--a))',
             },
           },
         },
