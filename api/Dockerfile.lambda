@@ -15,18 +15,21 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the binary for Lambda (requires specific entry point)
-# Lambda will call this binary, so it needs a compatible handler
-RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -a -installsuffix cgo -o bootstrap .
+# Build the binary for Lambda
+# The binary must be named 'bootstrap' for Lambda custom runtime
+# Lambda will detect AWS_LAMBDA_FUNCTION_NAME env var and start the Lambda handler
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -a -installsuffix cgo -o bootstrap ./
 
 # Lambda runtime stage
 FROM public.ecr.aws/lambda/provided:al2.2024.12.11-arm64
 
-# Copy ca-certificates from builder
+# Copy ca-certificates and timezone data from builder
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 
-# Copy bootstrap binary (Lambda expects this name)
+# Copy bootstrap binary (Lambda expects this name as the entry point)
 COPY --from=builder /build/bootstrap ${LAMBDA_TASK_ROOT}
 
-# Set the CMD to your handler
+# Lambda runtime will invoke the bootstrap binary with AWS_LAMBDA_FUNCTION_NAME set
+# Our code detects this env var and starts the Lambda handler instead of the HTTP server
 CMD [ "bootstrap" ]

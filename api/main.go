@@ -10,6 +10,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"github.com/sochoa/sochoa.dev/api/internal/auth"
@@ -17,6 +19,7 @@ import (
 	"github.com/sochoa/sochoa.dev/api/internal/db"
 	"github.com/sochoa/sochoa.dev/api/internal/handler"
 	"github.com/sochoa/sochoa.dev/api/internal/logger"
+	lambdaadapter "github.com/sochoa/sochoa.dev/api/internal/lambda"
 	"github.com/sochoa/sochoa.dev/api/internal/middleware"
 	"github.com/sochoa/sochoa.dev/api/internal/model"
 	_ "github.com/sochoa/sochoa.dev/api/docs"
@@ -31,10 +34,78 @@ var (
 		Long:  "sochoa.dev API is a REST API for a personal website with blog, guestbook, and analytics",
 		RunE:  serve,
 	}
+
+	// Global state for Lambda handler (initialized once at cold start)
+	lambdaAdapter *lambdaadapter.HandlerAdapter
 )
 
 func init() {
 	rootCmd.Flags().StringVar(&port, "port", "8080", "Port to listen on")
+}
+
+// initializeLambdaAdapter initializes the Lambda adapter with all dependencies
+// This runs once at cold start before handling requests
+func initializeLambdaAdapter() error {
+	// Load configuration
+	cfg, err := config.Load()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to load config: %v\n", err)
+		return err
+	}
+
+	// Initialize logger
+	log := logger.Setup(cfg.LogLevel)
+
+	// Configure Gin logger to suppress debug output
+	middleware.SetGinLogger(log)
+
+	// Configure Gin mode (always release mode for Lambda)
+	gin.SetMode(gin.ReleaseMode)
+
+	// Initialize database
+	database, err := db.Connect(context.Background(), cfg.DBDsn)
+	if err != nil {
+		log.Error("failed to initialize database", slog.String("error", err.Error()))
+		return err
+	}
+
+	// Run migrations
+	if err := db.MigrateUp(context.Background(), database); err != nil {
+		log.Error("failed to run migrations", slog.String("error", err.Error()))
+		database.Close()
+		return err
+	}
+	log.Info("database migrations completed")
+
+	// Initialize repositories
+	postRepo := model.NewPostRepository(database)
+	guestbookRepo := model.NewGuestbookRepository(database)
+	contactRepo := model.NewContactRepository(database)
+	statsRepo := model.NewStatsRepository(database)
+
+	// Initialize token verifier
+	tokenVerifier := auth.NewCognitoVerifier(cfg.CognitoUserPoolID, cfg.AWSRegion)
+
+	// Create router and register routes
+	apiRouter := handler.NewRouter(
+		log,
+		tokenVerifier,
+		postRepo,
+		guestbookRepo,
+		contactRepo,
+		statsRepo,
+	)
+	ginEngine := apiRouter.Register()
+
+	// Create Lambda adapter
+	lambdaAdapter = lambdaadapter.NewHandlerAdapter(ginEngine, log)
+
+	return nil
+}
+
+// handleLambdaRequest handles a single Lambda HTTP API request
+func handleLambdaRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	return lambdaAdapter.Handle(ctx, request)
 }
 
 func serve(_ *cobra.Command, _ []string) error {
@@ -130,6 +201,20 @@ func serve(_ *cobra.Command, _ []string) error {
 }
 
 func main() {
+	// Check if running in Lambda environment
+	if _, isLambda := os.LookupEnv("AWS_LAMBDA_FUNCTION_NAME"); isLambda {
+		// Initialize Lambda adapter once at cold start
+		if err := initializeLambdaAdapter(); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to initialize Lambda adapter: %v\n", err)
+			os.Exit(1)
+		}
+
+		// Start Lambda handler
+		lambda.Start(handleLambdaRequest)
+		return
+	}
+
+	// Local execution - use Cobra CLI
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
