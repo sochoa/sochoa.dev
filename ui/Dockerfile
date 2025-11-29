@@ -14,6 +14,10 @@ RUN npm install
 # Copy source code (invalidates cache if any files change)
 COPY . .
 
+# Verify TypeScript types and imports (catch errors early)
+# This runs before the dev server starts
+RUN npm run type-check
+
 # Expose dev server ports
 EXPOSE 5173
 EXPOSE 3000

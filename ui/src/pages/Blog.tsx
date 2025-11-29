@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { listPosts, type PostResponse } from '@/api'
+import { listPosts } from '@/api'
 
 interface Post {
   id: string

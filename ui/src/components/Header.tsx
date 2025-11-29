@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { useTheme } from '../hooks/useTheme'
 import { useAuthStore } from '../stores/authStore'
 import ThemeSelector from './ThemeSelector'
 

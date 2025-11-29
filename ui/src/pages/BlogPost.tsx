@@ -1,6 +1,6 @@
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { getPostBySlug, type PostResponse } from '@/api'
+import { getPostBySlug } from '@/api'
 
 interface Post {
   id: string
@@ -13,7 +13,6 @@ interface Post {
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>()
-  const navigate = useNavigate()
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

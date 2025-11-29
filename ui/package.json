@@ -7,10 +7,13 @@
     "api:generate": "npx @openapitools/openapi-generator-cli generate",
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:prod": "npm run verify:all && npm run build",
     "preview": "vite preview",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives",
     "type-check": "tsc --noEmit",
-    "format": "prettier --write src"
+    "format": "prettier --write src",
+    "verify:all": "npm run type-check && npm run lint",
+    "verify:imports": "bash scripts/verify-imports.sh"
   },
   "dependencies": {
     "@aws-amplify/auth": "^6.2.0",

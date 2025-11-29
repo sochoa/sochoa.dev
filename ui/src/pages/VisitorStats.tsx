@@ -238,13 +238,13 @@ export default function VisitorStats() {
                       })}
                     </td>
                     <td className="py-3 px-4 text-slate-700 dark:text-slate-300">
-                      {stat.pageViews.toLocaleString()}
+                      {(stat.pageviews || 0).toLocaleString()}
                     </td>
                     <td className="py-3 px-4 text-slate-700 dark:text-slate-300">
-                      {stat.uniqueVisitors.toLocaleString()}
+                      {(stat.unique_visitors || 0).toLocaleString()}
                     </td>
                     <td className="py-3 px-4 text-slate-700 dark:text-slate-300">
-                      {stat.topPage}
+                      {stat.page_path}
                     </td>
                   </tr>
                 ))}

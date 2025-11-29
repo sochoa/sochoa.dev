@@ -19,9 +19,23 @@ export async function authenticatedFetch(
   url: string,
   init?: RequestInit
 ): Promise<Response> {
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...init?.headers,
+  }
+
+  // Merge existing headers
+  if (init?.headers) {
+    if (init.headers instanceof Headers) {
+      init.headers.forEach((value, key) => {
+        headers[key] = value
+      })
+    } else if (Array.isArray(init.headers)) {
+      init.headers.forEach(([key, value]) => {
+        headers[key] = value
+      })
+    } else {
+      Object.assign(headers, init.headers as Record<string, string>)
+    }
   }
 
   // Try to get auth token from Cognito session
@@ -51,9 +65,10 @@ export async function authenticatedFetch(
   // Handle other errors
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
-    throw new Error(
-      (errorData as Record<string, unknown>).error || `API error: ${response.statusText}`
-    )
+    const errorMessage = typeof (errorData as Record<string, unknown>).error === 'string'
+      ? (errorData as Record<string, unknown>).error
+      : `API error: ${response.statusText}`
+    throw new Error(errorMessage as string)
   }
 
   return response

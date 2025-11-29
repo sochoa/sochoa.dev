@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '../stores/authStore'
-import { listGuestbookEntries, submitGuestbookEntry, type GuestbookEntryResponse } from '@/api'
+import { listGuestbookEntries, submitGuestbookEntry } from '@/api'
 
 interface GuestbookEntry {
   id: string
@@ -146,7 +146,7 @@ export default function Guestbook() {
       </p>
 
       {/* Submit Form */}
-      {token && user ? (
+      {user ? (
         <div className="bg-secondary border border-border-subtle rounded p-6 mb-12 shadow-subtle">
           <h2 className="text-2xl font-semibold text-text-primary mb-6">
             Leave a Message
