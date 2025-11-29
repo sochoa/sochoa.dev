@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 	"github.com/sochoa/sochoa.dev/api/internal/auth"
 	"github.com/sochoa/sochoa.dev/api/internal/config"
@@ -46,6 +47,13 @@ func serve(_ *cobra.Command, _ []string) error {
 	// Initialize logger
 	log := logger.Setup(cfg.LogLevel)
 
+	// Configure Gin mode (release mode disables debug logging)
+	if cfg.DevMode {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	// Initialize database
 	database, err := db.Connect(context.Background(), cfg.DBDsn)
 	if err != nil {
@@ -53,6 +61,13 @@ func serve(_ *cobra.Command, _ []string) error {
 		return err
 	}
 	defer database.Close()
+
+	// Run migrations
+	if err := db.MigrateUp(context.Background(), database); err != nil {
+		log.Error("failed to run migrations", slog.String("error", err.Error()))
+		return err
+	}
+	log.Info("database migrations completed")
 
 	// Initialize repositories
 	postRepo := model.NewPostRepository(database)

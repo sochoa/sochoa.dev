@@ -32,7 +32,8 @@ func NewRouter(
 	contactRepo *model.ContactRepository,
 	statsRepo *model.StatsRepository,
 ) *Router {
-	engine := gin.Default()
+	// Create engine without default middleware (we'll add custom ones)
+	engine := gin.New()
 
 	return &Router{
 		engine:           engine,
@@ -49,7 +50,8 @@ func NewRouter(
 func (r *Router) Register() *gin.Engine {
 	// Apply global middleware
 	r.engine.Use(middleware.RecoveryGin(r.log))
-	r.engine.Use(middleware.RequestLoggerGin(r.log))
+	r.engine.Use(middleware.GinLogger(r.log))
+	r.engine.Use(middleware.GinErrorLogger(r.log))
 
 	// Swagger documentation routes
 	r.engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
