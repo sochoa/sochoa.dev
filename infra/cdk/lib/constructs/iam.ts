@@ -9,6 +9,7 @@ export interface IamConstructProps {
   dbSecretArn: string;
   cognitoSecretArn: string;
   apiKeysSecretArn: string;
+  kmsKeyArn: string;
   environment: string;
 }
 
@@ -104,6 +105,30 @@ export class IamConstruct extends Construct {
       })
     );
 
+    // KMS permissions for decrypting secrets and logs
+    this.lambdaRole.addToPrincipalPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'kms:Decrypt',
+          'kms:DescribeKey',
+        ],
+        resources: [props.kmsKeyArn],
+      })
+    );
+
+    // X-Ray write permissions for tracing
+    this.lambdaRole.addToPrincipalPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'xray:PutTraceSegments',
+          'xray:PutTelemetryRecords',
+        ],
+        resources: ['*'],
+      })
+    );
+
     // API Gateway role
     this.apiGatewayRole = new iam.Role(this, 'ApiGatewayRole', {
       assumedBy: new iam.ServicePrincipal('apigateway.amazonaws.com'),
@@ -133,6 +158,18 @@ export class IamConstruct extends Construct {
         resources: [
           `arn:aws:logs:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account}:log-group:/aws/apigateway/*`,
         ],
+      })
+    );
+
+    // Allow API Gateway to decrypt KMS-encrypted logs
+    this.apiGatewayRole.addToPrincipalPolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: [
+          'kms:Decrypt',
+          'kms:DescribeKey',
+        ],
+        resources: [props.kmsKeyArn],
       })
     );
 

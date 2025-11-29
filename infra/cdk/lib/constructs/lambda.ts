@@ -3,6 +3,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as kms from 'aws-cdk-lib/aws-kms';
 import { Construct } from 'constructs';
 
 export interface LambdaConstructProps {
@@ -13,6 +14,7 @@ export interface LambdaConstructProps {
   dbName: string;
   dbSecretArn: string;
   apiKeysSecretArn: string;
+  encryptionKey: kms.IKey;
   environment: string;
 }
 
@@ -27,6 +29,7 @@ export class LambdaConstruct extends Construct {
       logGroupName: '/aws/lambda/sochoa-api',
       retention: logs.RetentionDays.TWO_WEEKS,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      encryptionKey: props.encryptionKey,
     });
 
     // Lambda function using Docker image

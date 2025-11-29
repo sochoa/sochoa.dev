@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { KmsConstruct } from './constructs/kms';
 import { VpcConstruct } from './constructs/vpc';
 import { SecretsConstruct } from './constructs/secrets';
 import { RdsConstruct } from './constructs/rds';
@@ -25,34 +26,42 @@ export class PrimaryStack extends cdk.Stack {
       maxAzs: 2,
     });
 
-    // 2. Create Secrets Manager for sensitive data
+    // 2. Create KMS key for encryption (used by RDS, S3, Logs, Secrets)
+    const kms = new KmsConstruct(this, 'KmsConstruct', {
+      environment,
+    });
+
+    // 4. Create Secrets Manager for sensitive data
     const secrets = new SecretsConstruct(this, 'SecretsConstruct', {
       environment,
     });
 
-    // 3. Create RDS PostgreSQL database
+    // 5. Create RDS PostgreSQL database
     const rds = new RdsConstruct(this, 'RdsConstruct', {
       vpc: vpc.vpc,
       masterUserPassword: secrets.dbPasswordSecret,
+      encryptionKey: kms.encryptionKey,
       environment,
     });
 
-    // 4. Create S3 bucket for UI
+    // 6. Create S3 bucket for UI
     const s3 = new S3Construct(this, 'S3Construct', {
       environment,
       bucketName: `sochoa-ui-${this.account}-${this.region}`,
+      encryptionKey: kms.encryptionKey,
     });
 
-    // 5. Create IAM roles (needed before Lambda)
+    // 8. Create IAM roles (needed before Lambda)
     const iam = new IamConstruct(this, 'IamConstruct', {
       dbSecurityGroupId: rds.securityGroup.securityGroupId,
       dbSecretArn: secrets.dbPasswordSecret.secretArn,
       cognitoSecretArn: secrets.cognitoSecrets.secretArn,
       apiKeysSecretArn: secrets.apiKeysSecret.secretArn,
+      kmsKeyArn: kms.encryptionKey.keyArn,
       environment,
     });
 
-    // 6. Create Lambda function for API
+    // 9. Create Lambda function for API
     const lambda = new LambdaConstruct(this, 'LambdaConstruct', {
       vpc: vpc.vpc,
       lambdaRole: iam.lambdaRole,
@@ -61,10 +70,11 @@ export class PrimaryStack extends cdk.Stack {
       dbName: 'sochoa',
       dbSecretArn: secrets.dbPasswordSecret.secretArn,
       apiKeysSecretArn: secrets.apiKeysSecret.secretArn,
+      encryptionKey: kms.encryptionKey,
       environment,
     });
 
-    // 7. Allow Lambda to connect to RDS
+    // 10. Allow Lambda to connect to RDS
     rds.securityGroup.addIngressRule(
       cdk.aws_ec2.Peer.securityGroupId(
         lambda.function.connections.securityGroups[0].securityGroupId
@@ -73,7 +83,7 @@ export class PrimaryStack extends cdk.Stack {
       'Allow PostgreSQL from Lambda'
     );
 
-    // 8. Create API Gateway
+    // 11. Create API Gateway
     const apiGateway = new ApiGatewayConstruct(
       this,
       'ApiGatewayConstruct',
@@ -81,17 +91,18 @@ export class PrimaryStack extends cdk.Stack {
         lambdaFunction: lambda.function,
         environment,
         uiDomain,
+        encryptionKey: kms.encryptionKey,
       }
     );
 
-    // 9. Create Cognito for authentication
+    // 12. Create Cognito for authentication
     const cognito = new CognitoConstruct(this, 'CognitoConstruct', {
       cognitoSecrets: secrets.cognitoSecrets,
       uiDomain,
       environment,
     });
 
-    // 10. Create CloudFront distribution for UI
+    // 13. Create CloudFront distribution for UI
     const cloudfront = new CloudFrontConstruct(
       this,
       'CloudFrontConstruct',
@@ -103,13 +114,14 @@ export class PrimaryStack extends cdk.Stack {
       }
     );
 
-    // 11. Create CloudWatch monitoring
+    // 14. Create CloudWatch monitoring
     const monitoring = new CloudWatchConstruct(
       this,
       'CloudWatchConstruct',
       {
         lambdaFunction: lambda.function,
         apiGateway: apiGateway.api,
+        encryptionKey: kms.encryptionKey,
         environment,
       }
     );

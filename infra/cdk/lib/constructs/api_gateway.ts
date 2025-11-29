@@ -3,12 +3,14 @@ import * as apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import * as apigatewayv2_integrations from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as kms from 'aws-cdk-lib/aws-kms';
 import { Construct } from 'constructs';
 
 export interface ApiGatewayConstructProps {
   lambdaFunction: lambda.Function;
   environment: string;
   uiDomain: string;
+  encryptionKey: kms.IKey;
 }
 
 export class ApiGatewayConstruct extends Construct {
@@ -22,6 +24,7 @@ export class ApiGatewayConstruct extends Construct {
     const accessLogGroup = new logs.LogGroup(this, 'ApiAccessLogs', {
       retention: logs.RetentionDays.ONE_MONTH,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      encryptionKey: props.encryptionKey,
     });
 
     // Create HTTP API (modern, lightweight alternative to REST API)
@@ -36,7 +39,9 @@ export class ApiGatewayConstruct extends Construct {
           apigatewayv2.CorsHttpMethod.DELETE,
           apigatewayv2.CorsHttpMethod.PATCH,
         ],
-        allowOrigins: [props.uiDomain, 'http://localhost:5173'], // Local dev
+        allowOrigins: props.environment === 'dev'
+          ? [props.uiDomain, 'http://localhost:5173']
+          : [props.uiDomain],
         allowHeaders: [
           'Content-Type',
           'Authorization',
@@ -73,8 +78,7 @@ export class ApiGatewayConstruct extends Construct {
       integration: lambdaIntegration,
     });
 
-    // Note: Access logs for HTTP API need to be configured separately
-    // This can be done via the AWS console or additional CDK patterns
+    // Access logs are configured via CloudWatch LogGroup with KMS encryption
 
     // API Gateway must have permission to invoke Lambda
     props.lambdaFunction.grantInvoke(
