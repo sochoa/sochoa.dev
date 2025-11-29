@@ -14,22 +14,13 @@ echo "📁 Database location: $DB_PATH"
 # Create cache directory if it doesn't exist
 mkdir -p "$CACHE_DIR"
 
-# Check if migrate is installed
-if ! command -v migrate &> /dev/null; then
-    echo "❌ golang-migrate is not installed"
-    echo "Install it with: brew install golang-migrate"
-    exit 1
-fi
-
-# Run migrations
-echo "📝 Running database migrations..."
-MIGRATION_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/db/migrations"
-migrate -path "$MIGRATION_PATH" -database "sqlite3://$DB_PATH" up
-
-echo "✅ Database setup complete!"
+# Note: Migrations run automatically on API startup
+echo "✅ Setup complete!"
 echo ""
-echo "🚀 To start the API:"
-echo "  DEV_MODE=true ./api"
+echo "🚀 To start the API (migrations run automatically):"
+echo "  ./api"
 echo ""
 echo "Or with a custom port:"
-echo "  DEV_MODE=true ./api --port 3000"
+echo "  ./api --port 3000"
+echo ""
+echo "💡 Note: Database and tables are created automatically on first run."
