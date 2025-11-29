@@ -27,7 +27,7 @@ export default function Header() {
           to="/"
           className="text-lg font-bold text-text-primary hover:text-accent-cyan transition-colors focus-visible-ring rounded px-2 py-1"
         >
-          sochoa.dev
+          <span className="text-accent-cyan">&gt;</span> sochoa.dev
         </Link>
 
         {/* Navigation Links */}
