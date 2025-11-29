@@ -2,6 +2,7 @@ package handler
 
 import (
 	"log/slog"
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -52,6 +53,16 @@ func (r *Router) Register() *gin.Engine {
 	r.engine.Use(middleware.RecoveryGin(r.log))
 	r.engine.Use(middleware.GinLogger(r.log))
 	r.engine.Use(middleware.GinErrorLogger(r.log))
+
+	// Root redirect to Swagger UI
+	r.engine.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
+
+	// Swagger path redirect to index.html
+	r.engine.GET("/swagger", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/swagger/index.html")
+	})
 
 	// Swagger documentation routes
 	r.engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
