@@ -78,10 +78,11 @@ export default function Home() {
             </p>
           </div>
           <p className="mt-4 text-base sm:text-lg text-text-secondary leading-relaxed max-w-3xl">
-            Engineer by craft, scientist because curiosity won’t leave me
-            alone.  I write to understand ideas and to communicate clearly
-            with others.  I build secure, resilient systems that help people
-            navigate complexity.
+            I have historically been a software engineer because I love automating things.  I call
+            myself a scientist because I am always asking questions about how things work, why they
+            work that way, and what could we do to make life better.  The rigor of the scientific method
+            also very much appeals to me.  I write to understand ideas and to communicate clearly
+            with others.  I am self-taught and learning all the time.
           </p>
         </div>
       </section>

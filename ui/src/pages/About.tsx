@@ -44,17 +44,17 @@ export default function About() {
               About Me
             </h1>
             <p className="text-lg text-text-secondary mb-4">
-                Hi! I'm an experienced engineer and I love designing and building secure and performant systems.  My work spans
-                distributed backend services, infrastructure automation, cloud native systems, security infrastructure, and developer
-                tooling that helps teams move faster and safer.
+                Hi! I'm an experienced software, systems, security, and infrastructure engineer.  My work spans
+                distributed backend services, infrastructure automation, cloud native systems, security
+                infrastructure, and developer tooling that helps teams move faster and safer.
             </p>
             <p className="text-lg text-text-secondary mb-4">
-              When I'm not building or designing, you'll find me writing, mentoring junior
-              developers, or exploring new ideas. I believe in clean self-documenting code,
-              automated security validation, and enabling my team to do less manual $#@$.
+              When I'm not building or designing, you'll find me tinkering, writing, mentoring, and exploring
+              new ideas. I believe in clean self-documenting code, automated security validation, and enabling
+              my team to do more with less.
             </p>
             <p className="text-lg text-text-secondary">
-              Currently focused on building scalable systems at Amazon Web Services.
+              Currently focused on building scalable data center controls systems at Amazon Web Services (11/2025).
             </p>
           </div>
         </div>
