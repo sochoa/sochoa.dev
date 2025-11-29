@@ -188,3 +188,14 @@ api/mocks/
 bin/
 *.out
 coverage.html
+
+# Compiled TypeScript output (from CDK and other TS projects)
+lib/**/*.js
+lib/**/*.d.ts
+bin/**/*.js
+bin/**/*.d.ts
+!jest.config.js
+
+# CDK asset staging and output
+.cdk.staging/
+cdk.out/
