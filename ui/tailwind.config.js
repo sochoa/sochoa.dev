@@ -5,6 +5,28 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   darkMode: 'class',
+  daisyui: {
+    themes: [
+      {
+        dark: {
+          primary: '#00d9ff',
+          secondary: '#00ffd1',
+          accent: '#ff006e',
+          neutral: '#1a1f3a',
+          'base-100': '#0a0e27',
+          'base-200': '#1a1f3a',
+          'base-300': '#242d47',
+          'base-content': '#e8ecf1',
+        },
+      },
+      'synthwave',
+      'cyberpunk',
+      'dracula',
+      'night',
+      'nord',
+      'dim',
+    ],
+  },
   theme: {
     extend: {
       fontFamily: {
@@ -83,5 +105,6 @@ export default {
   },
   plugins: [
     require('@tailwindcss/typography'),
+    require('daisyui'),
   ],
 }

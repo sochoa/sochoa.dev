@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 import { useAuthStore } from '../stores/authStore'
+import ThemeSelector from './ThemeSelector'
 
 export default function Header() {
-  const { isDark, toggle } = useTheme()
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
 
@@ -77,14 +77,8 @@ export default function Header() {
             </Link>
           )}
 
-          {/* Theme Toggle - text instead of emoji */}
-          <button
-            onClick={toggle}
-            className="ml-2 px-3 py-1 text-xs text-text-secondary bg-secondary rounded border border-border-subtle hover:border-border-accent hover:text-accent-cyan focus-visible-ring transition-colors"
-            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            [{isDark ? 'light' : 'dark'}]
-          </button>
+          {/* Theme Selector Combobox */}
+          <ThemeSelector />
         </div>
       </nav>
     </header>

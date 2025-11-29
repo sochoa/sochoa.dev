@@ -14,16 +14,14 @@
 
   html {
     scroll-behavior: smooth;
-    background-color: #0a0e27;
-    color: #e8ecf1;
   }
 
   body {
-    @apply bg-primary text-text-primary;
+    @apply transition-colors duration-200;
   }
 
   a {
-    @apply text-accent-cyan hover:text-accent-teal transition-colors;
+    @apply transition-colors duration-200;
   }
 
   button {
