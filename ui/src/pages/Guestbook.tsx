@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
+import { fetchAuthSession } from '@aws-amplify/auth'
 import { useAuthStore } from '../stores/authStore'
-import { apiCall } from '../lib/api'
 
 interface GuestbookEntry {
   id: string
@@ -25,7 +25,6 @@ interface FormState {
 
 export default function Guestbook() {
   const user = useAuthStore((s) => s.user)
-  const token = useAuthStore((s) => s.token)
   const [entries, setEntries] = useState<GuestbookEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -45,7 +44,9 @@ export default function Guestbook() {
   async function fetchEntries() {
     try {
       setLoading(true)
-      const data = await apiCall('/api/guestbook')
+      const response = await fetch('/api/guestbook')
+      if (!response.ok) throw new Error('Failed to load entries')
+      const data = await response.json()
       setEntries(data || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load entries')
@@ -90,6 +91,13 @@ export default function Guestbook() {
     setFormState((s) => ({ ...s, isSubmitting: true, error: undefined }))
 
     try {
+      const session = await fetchAuthSession()
+      const token = session?.tokens?.accessToken?.toString()
+
+      if (!token) {
+        throw new Error('No authentication token available')
+      }
+
       const response = await fetch('/api/guestbook', {
         method: 'POST',
         headers: {

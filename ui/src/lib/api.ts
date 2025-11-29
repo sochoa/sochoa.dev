@@ -1,3 +1,4 @@
+import { fetchAuthSession } from '@aws-amplify/auth'
 import { useAuthStore } from '../stores/authStore'
 
 interface FetchOptions extends RequestInit {
@@ -9,15 +10,24 @@ export async function apiCall(
   options: FetchOptions = {}
 ) {
   const { authenticated = false, ...fetchOptions } = options
-  const token = useAuthStore.getState().token
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...fetchOptions.headers,
   }
 
-  if (authenticated && token) {
-    headers['Authorization'] = `Bearer ${token}`
+  if (authenticated) {
+    try {
+      const session = await fetchAuthSession()
+      const token = session?.tokens?.accessToken?.toString()
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+    } catch (error) {
+      console.log('Could not get auth token')
+      useAuthStore.getState().logout()
+      throw new Error('Unauthorized')
+    }
   }
 
   const response = await fetch(url, {
@@ -30,14 +40,26 @@ export async function apiCall(
       useAuthStore.getState().logout()
       throw new Error('Unauthorized')
     }
-    throw new Error(`API error: ${response.statusText}`)
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(
+      errorData.error || `API error: ${response.statusText}`
+    )
   }
 
-  return response.json()
+  try {
+    return await response.json()
+  } catch {
+    return null
+  }
 }
 
-export function getAuthHeaders() {
-  const token = useAuthStore.getState().token
-  if (!token) return {}
-  return { Authorization: `Bearer ${token}` }
+export async function getAuthHeaders() {
+  try {
+    const session = await fetchAuthSession()
+    const token = session?.tokens?.accessToken?.toString()
+    if (!token) return {}
+    return { Authorization: `Bearer ${token}` }
+  } catch {
+    return {}
+  }
 }
