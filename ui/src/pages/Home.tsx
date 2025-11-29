@@ -13,16 +13,22 @@ export default function Home() {
         </p>
         <div className="flex flex-wrap gap-4">
           <Link
-            to="/blog"
+            to="/about"
             className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus-visible-ring"
           >
-            Read Blog
+            About Me
           </Link>
           <Link
-            to="/guestbook"
+            to="/work"
             className="inline-block px-6 py-3 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 focus-visible-ring"
           >
-            Sign Guestbook
+            View Work
+          </Link>
+          <Link
+            to="/blog"
+            className="inline-block px-6 py-3 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 focus-visible-ring"
+          >
+            Read Blog
           </Link>
           <Link
             to="/contact"
@@ -35,9 +41,17 @@ export default function Home() {
 
       {/* Featured Work */}
       <section className="mb-16">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">
-          Featured Work
-        </h2>
+        <div className="flex justify-between items-baseline mb-8">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Featured Work
+          </h2>
+          <Link
+            to="/work"
+            className="text-blue-600 dark:text-blue-400 hover:underline focus-visible-ring rounded"
+          >
+            View all →
+          </Link>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[1, 2].map((item) => (
             <div

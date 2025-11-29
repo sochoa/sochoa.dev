@@ -27,6 +27,18 @@ export default function Header() {
             Home
           </Link>
           <Link
+            to="/about"
+            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1"
+          >
+            About
+          </Link>
+          <Link
+            to="/work"
+            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1"
+          >
+            Work
+          </Link>
+          <Link
             to="/blog"
             className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1"
           >
