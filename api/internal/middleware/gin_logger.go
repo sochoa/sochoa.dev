@@ -7,6 +7,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GinLogWriter is a custom writer for Gin that redirects output to slog
+type GinLogWriter struct {
+	log *slog.Logger
+}
+
+func (w *GinLogWriter) Write(p []byte) (int, error) {
+	// Suppress Gin's default debug output - only log HTTP requests via middleware
+	return len(p), nil
+}
+
+// SetGinLogger configures Gin to use slog for internal logging
+func SetGinLogger(log *slog.Logger) {
+	gin.DefaultWriter = &GinLogWriter{log: log}
+	gin.DefaultErrorWriter = &GinLogWriter{log: log}
+}
+
 // GinLogger returns a Gin middleware that logs requests using slog in structured JSON format
 func GinLogger(log *slog.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {

@@ -17,6 +17,7 @@ import (
 	"github.com/sochoa/sochoa.dev/api/internal/db"
 	"github.com/sochoa/sochoa.dev/api/internal/handler"
 	"github.com/sochoa/sochoa.dev/api/internal/logger"
+	"github.com/sochoa/sochoa.dev/api/internal/middleware"
 	"github.com/sochoa/sochoa.dev/api/internal/model"
 	_ "github.com/sochoa/sochoa.dev/api/docs"
 )
@@ -47,7 +48,10 @@ func serve(_ *cobra.Command, _ []string) error {
 	// Initialize logger
 	log := logger.Setup(cfg.LogLevel)
 
-	// Configure Gin mode (release mode disables debug logging)
+	// Configure Gin logger to suppress debug output
+	middleware.SetGinLogger(log)
+
+	// Configure Gin mode
 	if cfg.DevMode {
 		gin.SetMode(gin.DebugMode)
 	} else {
