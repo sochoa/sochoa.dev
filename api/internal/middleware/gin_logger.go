@@ -13,7 +13,10 @@ type GinLogWriter struct {
 }
 
 func (w *GinLogWriter) Write(p []byte) (int, error) {
-	// Suppress Gin's default debug output - only log HTTP requests via middleware
+	// Log Gin's output as debug messages in structured format
+	if len(p) > 0 {
+		w.log.Debug("gin", slog.String("message", string(p)))
+	}
 	return len(p), nil
 }
 
