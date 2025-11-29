@@ -71,7 +71,11 @@ migrate -path db/migrations -database "sqlite3://$HOME/.cache/sochoa.dev/api.db"
 ## API Documentation
 
 Once running, access Swagger UI at:
-- **URL**: http://localhost:8080/swagger/index.html (or your custom port)
+- **Swagger UI**: http://localhost:8080/swagger/index.html
+- **OpenAPI JSON**: http://localhost:8080/swagger/swagger.json
+- **OpenAPI YAML**: http://localhost:8080/swagger/swagger.yaml
+
+(Replace 8080 with your custom port if using `--port`)
 
 ## Testing Endpoints
 
@@ -139,6 +143,6 @@ DEV_MODE=true DEV_USER_ROLE=admin LOG_LEVEL=debug ./api --port 3000
 # In another terminal, test health endpoint
 curl http://localhost:3000/api/health
 
-# View docs
+# View API documentation
 open http://localhost:3000/swagger/index.html
 ```
