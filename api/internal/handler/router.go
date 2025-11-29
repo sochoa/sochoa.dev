@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/sochoa/sochoa.dev/api/internal/auth"
 	"github.com/sochoa/sochoa.dev/api/internal/middleware"
 	"github.com/sochoa/sochoa.dev/api/internal/model"
@@ -49,6 +51,9 @@ func (r *Router) Register() *gin.Engine {
 	r.engine.Use(middleware.RecoveryGin(r.log))
 	r.engine.Use(middleware.RequestLoggerGin(r.log))
 
+	// Swagger documentation routes
+	r.engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	// Health check (no auth required)
 	r.engine.GET("/api/health", r.healthCheck)
 
@@ -82,6 +87,12 @@ func (r *Router) Register() *gin.Engine {
 }
 
 // healthCheck handles GET /api/health
+// @Summary		Health check
+// @Description	Check API health status
+// @Tags			Health
+// @Produce		json
+// @Success		200	{object}	map[string]interface{}	"API is healthy"
+// @Router			/api/health [get]
 func (r *Router) healthCheck(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"status": "healthy",

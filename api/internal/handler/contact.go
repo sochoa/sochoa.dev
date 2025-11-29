@@ -32,6 +32,16 @@ type SubmitContactRequest struct {
 }
 
 // SubmitContact handles POST /api/contact (public with optional auth for rate limiting bypass)
+// @Summary		Submit a contact form
+// @Description	Submit a contact form message (public, rate limited to 5 per day per email)
+// @Tags			Contact
+// @Accept			json
+// @Produce		json
+// @Param			request	body		SubmitContactRequest	true	"Contact form request"
+// @Success		201		{object}	view.ContactSubmissionResponse	"Submission received"
+// @Failure		400		{object}	map[string]string				"Invalid request body"
+// @Failure		429		{object}	map[string]string				"Rate limit exceeded"
+// @Router			/api/contact [post]
 func (h *ContactHandler) SubmitContact(c *gin.Context) {
 	var req SubmitContactRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -80,6 +90,17 @@ func (h *ContactHandler) SubmitContact(c *gin.Context) {
 }
 
 // ListContactSubmissions handles GET /api/contact (admin only)
+// @Summary		List contact submissions
+// @Description	List contact submissions (admin only, can filter by status)
+// @Tags			Contact
+// @Produce		json
+// @Param			status	query		string	false	"Filter by status (received, replied, archived)"
+// @Param			limit	query		integer	false	"Number of submissions per page (default: 10)"
+// @Param			offset	query		integer	false	"Number of submissions to skip (default: 0)"
+// @Success		200		{array}		view.ContactSubmissionResponse	"List of submissions"
+// @Failure		403		{object}	map[string]string				"Forbidden - admin role required"
+// @Router			/api/contact [get]
+// @Security		BearerAuth
 func (h *ContactHandler) ListContactSubmissions(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
@@ -113,6 +134,18 @@ type UpdateContactStatusRequest struct {
 }
 
 // UpdateContactStatus handles PATCH /api/contact/:id (admin only)
+// @Summary		Update contact submission status
+// @Description	Update the status of a contact submission (admin only)
+// @Tags			Contact
+// @Accept			json
+// @Param			id		path		string							true	"Submission ID (UUID)"
+// @Param			request	body		UpdateContactStatusRequest	true	"Status update request"
+// @Success		204			"Status updated"
+// @Failure		400		{object}	map[string]string	"Invalid request"
+// @Failure		403		{object}	map[string]string	"Forbidden - admin role required"
+// @Failure		404		{object}	map[string]string	"Submission not found"
+// @Router			/api/contact/{id} [patch]
+// @Security		BearerAuth
 func (h *ContactHandler) UpdateContactStatus(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {

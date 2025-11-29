@@ -33,6 +33,18 @@ type CreatePostRequest struct {
 }
 
 // CreatePost handles POST /api/posts (admin only)
+// @Summary		Create a new blog post
+// @Description	Create a new blog post (admin only)
+// @Tags			Posts
+// @Accept			json
+// @Produce		json
+// @Param			request	body		CreatePostRequest	true	"Post request body"
+// @Success		201		{object}	view.PostResponse	"Post created successfully"
+// @Failure		400		{object}	map[string]string	"Invalid request body"
+// @Failure		401		{object}	map[string]string	"Unauthorized"
+// @Failure		403		{object}	map[string]string	"Forbidden - admin role required"
+// @Router			/api/posts [post]
+// @Security		BearerAuth
 func (h *PostHandler) CreatePost(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if !user.IsAdmin() {
@@ -69,6 +81,15 @@ func (h *PostHandler) CreatePost(c *gin.Context) {
 }
 
 // GetPost handles GET /api/posts/:slug (public)
+// @Summary		Get a blog post by slug
+// @Description	Get a blog post by slug (public posts visible to all, drafts only to admin)
+// @Tags			Posts
+// @Produce		json
+// @Param			slug	path		string	true	"Post slug"
+// @Success		200		{object}	view.PostResponse	"Post found"
+// @Failure		400		{object}	map[string]string	"Missing slug parameter"
+// @Failure		404		{object}	map[string]string	"Post not found"
+// @Router			/api/posts/{slug} [get]
 func (h *PostHandler) GetPost(c *gin.Context) {
 	slug := c.Param("slug")
 	if slug == "" {
@@ -96,6 +117,16 @@ func (h *PostHandler) GetPost(c *gin.Context) {
 }
 
 // ListPublishedPosts handles GET /api/posts (public)
+// @Summary		List all published blog posts
+// @Description	List all published blog posts with optional pagination and tag filtering
+// @Tags			Posts
+// @Produce		json
+// @Param			limit	query		integer	false	"Number of posts per page (default: 10)"
+// @Param			offset	query		integer	false	"Number of posts to skip (default: 0)"
+// @Param			tag		query		string	false	"Filter posts by tag"
+// @Success		200		{array}		view.PostResponse	"List of published posts"
+// @Failure		500		{object}	map[string]string	"Internal server error"
+// @Router			/api/posts [get]
 func (h *PostHandler) ListPublishedPosts(c *gin.Context) {
 	limit, offset := parsePaginationGin(c)
 	tag := c.Query("tag")
@@ -121,6 +152,20 @@ type UpdatePostRequest struct {
 }
 
 // UpdatePost handles PUT /api/posts/:id (admin only)
+// @Summary		Update a blog post
+// @Description	Update a blog post by ID (admin only)
+// @Tags			Posts
+// @Accept			json
+// @Produce		json
+// @Param			id		path		string				true	"Post ID (UUID)"
+// @Param			request	body		UpdatePostRequest	true	"Updated post data"
+// @Success		200		{object}	view.PostResponse	"Post updated successfully"
+// @Failure		400		{object}	map[string]string	"Invalid request"
+// @Failure		401		{object}	map[string]string	"Unauthorized"
+// @Failure		403		{object}	map[string]string	"Forbidden - admin role required"
+// @Failure		404		{object}	map[string]string	"Post not found"
+// @Router			/api/posts/{id} [put]
+// @Security		BearerAuth
 func (h *PostHandler) UpdatePost(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if !user.IsAdmin() {
@@ -170,6 +215,17 @@ func (h *PostHandler) UpdatePost(c *gin.Context) {
 }
 
 // DeletePost handles DELETE /api/posts/:id (admin only)
+// @Summary		Delete a blog post
+// @Description	Delete a blog post by ID (admin only)
+// @Tags			Posts
+// @Param			id	path	string	true	"Post ID (UUID)"
+// @Success		204			"Post deleted successfully"
+// @Failure		400	{object}	map[string]string	"Invalid request"
+// @Failure		401	{object}	map[string]string	"Unauthorized"
+// @Failure		403	{object}	map[string]string	"Forbidden - admin role required"
+// @Failure		404	{object}	map[string]string	"Post not found"
+// @Router			/api/posts/{id} [delete]
+// @Security		BearerAuth
 func (h *PostHandler) DeletePost(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if !user.IsAdmin() {

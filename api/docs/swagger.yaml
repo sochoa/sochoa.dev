@@ -1,0 +1,932 @@
+definitions:
+  handler.ApproveGuestbookEntryRequest:
+    properties:
+      approve:
+        type: boolean
+    type: object
+  handler.CreatePostRequest:
+    properties:
+      body:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      summary:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - body
+    - slug
+    - status
+    - title
+    type: object
+  handler.RecordStatsRequest:
+    properties:
+      country:
+        type: string
+      date:
+        type: string
+      errors_4xx:
+        type: integer
+      errors_5xx:
+        type: integer
+      latency_p50:
+        type: number
+      latency_p95:
+        type: number
+      latency_p99:
+        type: number
+      page_path:
+        type: string
+      pageviews:
+        type: integer
+      referrer_domain:
+        type: string
+      unique_visitors:
+        type: integer
+    required:
+    - date
+    - page_path
+    type: object
+  handler.SubmitContactRequest:
+    properties:
+      email:
+        type: string
+      honeypot:
+        description: Anti-spam field - should be empty
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+    type: object
+  handler.SubmitGuestbookEntryRequest:
+    properties:
+      display_name:
+        type: string
+      honeypot:
+        description: Anti-spam field - should be empty
+        type: string
+      message:
+        type: string
+    type: object
+  handler.UpdateContactStatusRequest:
+    properties:
+      status:
+        type: string
+    type: object
+  handler.UpdatePostRequest:
+    properties:
+      body:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      summary:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - body
+    - slug
+    - status
+    - title
+    type: object
+  handler.UpdateStatsRequest:
+    properties:
+      errors_4xx:
+        type: integer
+      errors_5xx:
+        type: integer
+      latency_p50:
+        type: number
+      latency_p95:
+        type: number
+      latency_p99:
+        type: number
+      pageviews:
+        type: integer
+      unique_visitors:
+        type: integer
+    type: object
+  view.ContactSubmissionResponse:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+    type: object
+  view.GuestbookEntryResponse:
+    properties:
+      created_at:
+        type: string
+      display_name:
+        type: string
+      id:
+        type: string
+      is_approved:
+        type: boolean
+      message:
+        type: string
+      user_id:
+        type: string
+      user_provider:
+        type: string
+    type: object
+  view.PostResponse:
+    properties:
+      body:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      published_at:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      summary:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  view.VisitorStatResponse:
+    properties:
+      country:
+        type: string
+      created_at:
+        type: string
+      date:
+        type: string
+      errors_4xx:
+        type: integer
+      errors_5xx:
+        type: integer
+      id:
+        type: string
+      latency_p50:
+        type: number
+      latency_p95:
+        type: number
+      latency_p99:
+        type: number
+      page_path:
+        type: string
+      pageviews:
+        type: integer
+      referrer_domain:
+        type: string
+      unique_visitors:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/contact:
+    get:
+      description: List contact submissions (admin only, can filter by status)
+      parameters:
+      - description: Filter by status (received, replied, archived)
+        in: query
+        name: status
+        type: string
+      - description: 'Number of submissions per page (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - description: 'Number of submissions to skip (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of submissions
+          schema:
+            items:
+              $ref: '#/definitions/view.ContactSubmissionResponse'
+            type: array
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List contact submissions
+      tags:
+      - Contact
+    post:
+      consumes:
+      - application/json
+      description: Submit a contact form message (public, rate limited to 5 per day
+        per email)
+      parameters:
+      - description: Contact form request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.SubmitContactRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Submission received
+          schema:
+            $ref: '#/definitions/view.ContactSubmissionResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "429":
+          description: Rate limit exceeded
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Submit a contact form
+      tags:
+      - Contact
+  /api/contact/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Update the status of a contact submission (admin only)
+      parameters:
+      - description: Submission ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Status update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateContactStatusRequest'
+      responses:
+        "204":
+          description: Status updated
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Submission not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update contact submission status
+      tags:
+      - Contact
+  /api/guestbook:
+    get:
+      description: List all approved guestbook entries (public)
+      parameters:
+      - description: 'Number of entries per page (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - description: 'Number of entries to skip (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of approved entries
+          schema:
+            items:
+              $ref: '#/definitions/view.GuestbookEntryResponse'
+            type: array
+      summary: List approved guestbook entries
+      tags:
+      - Guestbook
+    post:
+      consumes:
+      - application/json
+      description: Submit a new guestbook entry (authenticated users only, requires
+        approval)
+      parameters:
+      - description: Guestbook entry request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.SubmitGuestbookEntryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Entry submitted successfully
+          schema:
+            $ref: '#/definitions/view.GuestbookEntryResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "429":
+          description: Rate limit exceeded
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Submit a guestbook entry
+      tags:
+      - Guestbook
+  /api/guestbook/{id}:
+    delete:
+      description: Delete a guestbook entry (admin only)
+      parameters:
+      - description: Entry ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: Entry deleted successfully
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Entry not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a guestbook entry
+      tags:
+      - Guestbook
+  /api/guestbook/{id}/approve:
+    post:
+      consumes:
+      - application/json
+      description: Approve or reject a pending guestbook entry (admin only)
+      parameters:
+      - description: Entry ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Approve/reject request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.ApproveGuestbookEntryRequest'
+      responses:
+        "204":
+          description: Entry status updated
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Entry not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Approve or reject a guestbook entry
+      tags:
+      - Guestbook
+  /api/guestbook/pending:
+    get:
+      description: List all pending guestbook entries awaiting approval (admin only)
+      parameters:
+      - description: 'Number of entries per page (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - description: 'Number of entries to skip (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of pending entries
+          schema:
+            items:
+              $ref: '#/definitions/view.GuestbookEntryResponse'
+            type: array
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List pending guestbook entries
+      tags:
+      - Guestbook
+  /api/health:
+    get:
+      description: Check API health status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: API is healthy
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health check
+      tags:
+      - Health
+  /api/posts:
+    get:
+      description: List all published blog posts with optional pagination and tag
+        filtering
+      parameters:
+      - description: 'Number of posts per page (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - description: 'Number of posts to skip (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      - description: Filter posts by tag
+        in: query
+        name: tag
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of published posts
+          schema:
+            items:
+              $ref: '#/definitions/view.PostResponse'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all published blog posts
+      tags:
+      - Posts
+    post:
+      consumes:
+      - application/json
+      description: Create a new blog post (admin only)
+      parameters:
+      - description: Post request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Post created successfully
+          schema:
+            $ref: '#/definitions/view.PostResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a new blog post
+      tags:
+      - Posts
+  /api/posts/{id}:
+    delete:
+      description: Delete a blog post by ID (admin only)
+      parameters:
+      - description: Post ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: Post deleted successfully
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Post not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a blog post
+      tags:
+      - Posts
+    put:
+      consumes:
+      - application/json
+      description: Update a blog post by ID (admin only)
+      parameters:
+      - description: Post ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated post data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Post updated successfully
+          schema:
+            $ref: '#/definitions/view.PostResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Post not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a blog post
+      tags:
+      - Posts
+  /api/posts/{slug}:
+    get:
+      description: Get a blog post by slug (public posts visible to all, drafts only
+        to admin)
+      parameters:
+      - description: Post slug
+        in: path
+        name: slug
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Post found
+          schema:
+            $ref: '#/definitions/view.PostResponse'
+        "400":
+          description: Missing slug parameter
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Post not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a blog post by slug
+      tags:
+      - Posts
+  /api/stats:
+    get:
+      description: List visitor stats for a date range (admin only)
+      parameters:
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        required: true
+        type: string
+      - description: 'Number of records per page (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - description: 'Number of records to skip (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of stats records
+          schema:
+            items:
+              $ref: '#/definitions/view.VisitorStatResponse'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List stats by date range
+      tags:
+      - Stats
+    post:
+      consumes:
+      - application/json
+      description: Record visitor statistics for a page (admin only, requires signed
+        key in production)
+      parameters:
+      - description: Stats record request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.RecordStatsRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Stats recorded successfully
+          schema:
+            $ref: '#/definitions/view.VisitorStatResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Record visitor statistics
+      tags:
+      - Stats
+  /api/stats/{id}:
+    get:
+      description: Get visitor stats for a specific record (admin only)
+      parameters:
+      - description: Stats ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Stats record
+          schema:
+            $ref: '#/definitions/view.VisitorStatResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Stats not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get visitor stats by ID
+      tags:
+      - Stats
+    put:
+      consumes:
+      - application/json
+      description: Update visitor stats for a specific record (admin only)
+      parameters:
+      - description: Stats ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated stats data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.UpdateStatsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Stats updated successfully
+          schema:
+            $ref: '#/definitions/view.VisitorStatResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Stats not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update visitor stats
+      tags:
+      - Stats
+  /api/stats/page/{page_path}:
+    get:
+      description: List visitor stats for a specific page path (admin only)
+      parameters:
+      - description: Page path (URL path)
+        in: path
+        name: page_path
+        required: true
+        type: string
+      - description: 'Number of records per page (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - description: 'Number of records to skip (default: 0)'
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of stats for page
+          schema:
+            items:
+              $ref: '#/definitions/view.VisitorStatResponse'
+            type: array
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "403":
+          description: Forbidden - admin role required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List stats by page
+      tags:
+      - Stats
+swagger: "2.0"

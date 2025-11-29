@@ -30,6 +30,18 @@ type SubmitGuestbookEntryRequest struct {
 }
 
 // SubmitGuestbookEntry handles POST /api/guestbook (authenticated users)
+// @Summary		Submit a guestbook entry
+// @Description	Submit a new guestbook entry (authenticated users only, requires approval)
+// @Tags			Guestbook
+// @Accept			json
+// @Produce		json
+// @Param			request	body		SubmitGuestbookEntryRequest	true	"Guestbook entry request"
+// @Success		201		{object}	view.GuestbookEntryResponse	"Entry submitted successfully"
+// @Failure		400		{object}	map[string]string			"Invalid request body"
+// @Failure		401		{object}	map[string]string			"Unauthorized"
+// @Failure		429		{object}	map[string]string			"Rate limit exceeded"
+// @Router			/api/guestbook [post]
+// @Security		BearerAuth
 func (h *GuestbookHandler) SubmitGuestbookEntry(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if user == nil {
@@ -83,6 +95,14 @@ func (h *GuestbookHandler) SubmitGuestbookEntry(c *gin.Context) {
 }
 
 // ListApprovedGuestbookEntries handles GET /api/guestbook (public)
+// @Summary		List approved guestbook entries
+// @Description	List all approved guestbook entries (public)
+// @Tags			Guestbook
+// @Produce		json
+// @Param			limit	query		integer	false	"Number of entries per page (default: 10)"
+// @Param			offset	query		integer	false	"Number of entries to skip (default: 0)"
+// @Success		200		{array}		view.GuestbookEntryResponse	"List of approved entries"
+// @Router			/api/guestbook [get]
 func (h *GuestbookHandler) ListApprovedGuestbookEntries(c *gin.Context) {
 	limit, offset := parsePaginationGin(c)
 
@@ -96,6 +116,16 @@ func (h *GuestbookHandler) ListApprovedGuestbookEntries(c *gin.Context) {
 }
 
 // ListPendingGuestbookEntries handles GET /api/guestbook/pending (admin only)
+// @Summary		List pending guestbook entries
+// @Description	List all pending guestbook entries awaiting approval (admin only)
+// @Tags			Guestbook
+// @Produce		json
+// @Param			limit	query		integer	false	"Number of entries per page (default: 10)"
+// @Param			offset	query		integer	false	"Number of entries to skip (default: 0)"
+// @Success		200		{array}		view.GuestbookEntryResponse	"List of pending entries"
+// @Failure		403		{object}	map[string]string			"Forbidden - admin role required"
+// @Router			/api/guestbook/pending [get]
+// @Security		BearerAuth
 func (h *GuestbookHandler) ListPendingGuestbookEntries(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
@@ -120,6 +150,18 @@ type ApproveGuestbookEntryRequest struct {
 }
 
 // ApproveGuestbookEntry handles POST /api/guestbook/:id/approve (admin only)
+// @Summary		Approve or reject a guestbook entry
+// @Description	Approve or reject a pending guestbook entry (admin only)
+// @Tags			Guestbook
+// @Accept			json
+// @Param			id		path		string									true	"Entry ID (UUID)"
+// @Param			request	body		ApproveGuestbookEntryRequest	true	"Approve/reject request"
+// @Success		204			"Entry status updated"
+// @Failure		400		{object}	map[string]string			"Invalid request"
+// @Failure		403		{object}	map[string]string			"Forbidden - admin role required"
+// @Failure		404		{object}	map[string]string			"Entry not found"
+// @Router			/api/guestbook/{id}/approve [post]
+// @Security		BearerAuth
 func (h *GuestbookHandler) ApproveGuestbookEntry(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
@@ -163,6 +205,16 @@ func (h *GuestbookHandler) ApproveGuestbookEntry(c *gin.Context) {
 }
 
 // DeleteGuestbookEntry handles DELETE /api/guestbook/:id (admin only)
+// @Summary		Delete a guestbook entry
+// @Description	Delete a guestbook entry (admin only)
+// @Tags			Guestbook
+// @Param			id	path	string	true	"Entry ID (UUID)"
+// @Success		204			"Entry deleted successfully"
+// @Failure		400	{object}	map[string]string	"Invalid request"
+// @Failure		403	{object}	map[string]string	"Forbidden - admin role required"
+// @Failure		404	{object}	map[string]string	"Entry not found"
+// @Router			/api/guestbook/{id} [delete]
+// @Security		BearerAuth
 func (h *GuestbookHandler) DeleteGuestbookEntry(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {

@@ -39,6 +39,17 @@ type RecordStatsRequest struct {
 }
 
 // RecordStats handles POST /api/stats (internal metrics intake, requires signed header)
+// @Summary		Record visitor statistics
+// @Description	Record visitor statistics for a page (admin only, requires signed key in production)
+// @Tags			Stats
+// @Accept			json
+// @Produce		json
+// @Param			request	body		RecordStatsRequest	true	"Stats record request"
+// @Success		201		{object}	view.VisitorStatResponse	"Stats recorded successfully"
+// @Failure		400		{object}	map[string]string			"Invalid request"
+// @Failure		403		{object}	map[string]string			"Forbidden - admin role required"
+// @Router			/api/stats [post]
+// @Security		BearerAuth
 func (h *StatsHandler) RecordStats(c *gin.Context) {
 	// In production, this would validate a signed key header from CloudWatch or metrics service
 	// For now, we'll accept any request if admin is authenticated
@@ -85,6 +96,17 @@ func (h *StatsHandler) RecordStats(c *gin.Context) {
 }
 
 // GetStats handles GET /api/stats/:id (admin only)
+// @Summary		Get visitor stats by ID
+// @Description	Get visitor stats for a specific record (admin only)
+// @Tags			Stats
+// @Produce		json
+// @Param			id	path		string	true	"Stats ID (UUID)"
+// @Success		200		{object}	view.VisitorStatResponse	"Stats record"
+// @Failure		400		{object}	map[string]string			"Invalid request"
+// @Failure		403		{object}	map[string]string			"Forbidden - admin role required"
+// @Failure		404		{object}	map[string]string			"Stats not found"
+// @Router			/api/stats/{id} [get]
+// @Security		BearerAuth
 func (h *StatsHandler) GetStats(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
@@ -115,6 +137,19 @@ func (h *StatsHandler) GetStats(c *gin.Context) {
 }
 
 // ListStatsByDateRange handles GET /api/stats (admin only)
+// @Summary		List stats by date range
+// @Description	List visitor stats for a date range (admin only)
+// @Tags			Stats
+// @Produce		json
+// @Param			start_date	query		string	true	"Start date (YYYY-MM-DD)"
+// @Param			end_date	query		string	true	"End date (YYYY-MM-DD)"
+// @Param			limit		query		integer	false	"Number of records per page (default: 10)"
+// @Param			offset		query		integer	false	"Number of records to skip (default: 0)"
+// @Success		200		{array}		view.VisitorStatResponse	"List of stats records"
+// @Failure		400		{object}	map[string]string			"Invalid request"
+// @Failure		403		{object}	map[string]string			"Forbidden - admin role required"
+// @Router			/api/stats [get]
+// @Security		BearerAuth
 func (h *StatsHandler) ListStatsByDateRange(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
@@ -154,6 +189,18 @@ func (h *StatsHandler) ListStatsByDateRange(c *gin.Context) {
 }
 
 // ListStatsByPage handles GET /api/stats/page/:page_path (admin only)
+// @Summary		List stats by page
+// @Description	List visitor stats for a specific page path (admin only)
+// @Tags			Stats
+// @Produce		json
+// @Param			page_path	path		string	true	"Page path (URL path)"
+// @Param			limit		query		integer	false	"Number of records per page (default: 10)"
+// @Param			offset		query		integer	false	"Number of records to skip (default: 0)"
+// @Success		200		{array}		view.VisitorStatResponse	"List of stats for page"
+// @Failure		400		{object}	map[string]string			"Invalid request"
+// @Failure		403		{object}	map[string]string			"Forbidden - admin role required"
+// @Router			/api/stats/page/{page_path} [get]
+// @Security		BearerAuth
 func (h *StatsHandler) ListStatsByPage(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {
@@ -190,6 +237,19 @@ type UpdateStatsRequest struct {
 }
 
 // UpdateStats handles PUT /api/stats/:id (admin only)
+// @Summary		Update visitor stats
+// @Description	Update visitor stats for a specific record (admin only)
+// @Tags			Stats
+// @Accept			json
+// @Produce		json
+// @Param			id		path		string				true	"Stats ID (UUID)"
+// @Param			request	body		UpdateStatsRequest	true	"Updated stats data"
+// @Success		200		{object}	view.VisitorStatResponse	"Stats updated successfully"
+// @Failure		400		{object}	map[string]string			"Invalid request"
+// @Failure		403		{object}	map[string]string			"Forbidden - admin role required"
+// @Failure		404		{object}	map[string]string			"Stats not found"
+// @Router			/api/stats/{id} [put]
+// @Security		BearerAuth
 func (h *StatsHandler) UpdateStats(c *gin.Context) {
 	user := c.MustGet("user").(*auth.User)
 	if user == nil || !user.IsAdmin() {

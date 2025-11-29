@@ -17,6 +17,7 @@ import (
 	"github.com/sochoa/sochoa.dev/api/internal/handler"
 	"github.com/sochoa/sochoa.dev/api/internal/logger"
 	"github.com/sochoa/sochoa.dev/api/internal/model"
+	_ "github.com/sochoa/sochoa.dev/api/docs"
 )
 
 var (
