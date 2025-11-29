@@ -1,15 +1,15 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { VpcConstruct } from './constructs/VpcConstruct';
-import { SecretsConstruct } from './constructs/SecretsConstruct';
-import { RdsConstruct } from './constructs/RdsConstruct';
-import { S3Construct } from './constructs/S3Construct';
-import { CloudFrontConstruct } from './constructs/CloudFrontConstruct';
-import { CognitoConstruct } from './constructs/CognitoConstruct';
-import { IamConstruct } from './constructs/IamConstruct';
-import { LambdaConstruct } from './constructs/LambdaConstruct';
-import { ApiGatewayConstructConstruct } from './constructs/ApiGatewayConstruct';
-import { CloudWatchConstruct } from './constructs/CloudWatchConstruct';
+import { VpcConstruct } from './constructs/vpc';
+import { SecretsConstruct } from './constructs/secrets';
+import { RdsConstruct } from './constructs/rds';
+import { S3Construct } from './constructs/s3';
+import { CloudFrontConstruct } from './constructs/cloudfront';
+import { CognitoConstruct } from './constructs/cognito';
+import { IamConstruct } from './constructs/iam';
+import { LambdaConstruct } from './constructs/lambda';
+import { ApiGatewayConstruct } from './constructs/api_gateway';
+import { CloudWatchConstruct } from './constructs/cloudwatch';
 
 export class CdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -74,7 +74,7 @@ export class CdkStack extends cdk.Stack {
     );
 
     // 8. Create API Gateway
-    const apiGateway = new ApiGatewayConstructConstruct(
+    const apiGateway = new ApiGatewayConstruct(
       this,
       'ApiGatewayConstruct',
       {
