@@ -40,6 +40,16 @@ export default {
           '"Courier New"',
           'monospace',
         ],
+        sans: [
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          '"Segoe UI"',
+          'Roboto',
+          '"Helvetica Neue"',
+          'Arial',
+          'sans-serif',
+        ],
       },
       colors: {
         // Use DaisyUI CSS variables for theme-aware colors

@@ -76,6 +76,17 @@ export const COLOR_PALETTES: ColorPalette[] = [
       '--accent-purple': '#06b6d4',
     },
   },
+  {
+    id: 'neon-green',
+    name: 'Neon Green',
+    description: 'Bright neon green with magenta accents',
+    primary: '#39ff14',
+    secondary: '#ff10f0',
+    cssVariables: {
+      '--accent-cyan': '#39ff14',
+      '--accent-purple': '#ff10f0',
+    },
+  },
 ]
 
 export function getPaletteById(id: string): ColorPalette | undefined {

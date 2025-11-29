@@ -1,3 +1,5 @@
+import { PageContainer, PageHeader, Card, Tag } from '../components/ui'
+
 export default function Work() {
   const projects = [
     {
@@ -64,92 +66,77 @@ export default function Work() {
   ]
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-      {/* Header */}
-      <section className="mb-12">
-        <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
-          Work & Projects
-        </h1>
-        <p className="text-xl text-slate-600 dark:text-slate-300">
-          A selection of projects I've led and contributed to, showcasing my experience in
-          full-stack development, system design, and product delivery.
-        </p>
-      </section>
+    <PageContainer>
+      <PageHeader
+        title="Work & Projects"
+        subtitle="A selection of projects I've led and contributed to, showcasing my experience in full-stack development, system design, and product delivery."
+      />
 
-      {/* Projects Grid */}
       <div className="space-y-12">
         {projects.map((project) => (
-          <article
-            key={project.id}
-            className="border border-slate-200 dark:border-slate-800 rounded-lg p-6 hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
-          >
+          <Card key={project.id} variant="default" hover>
             {/* Title */}
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+            <h2 className="text-2xl font-bold text-text-primary mb-2 font-mono">
               {project.title}
             </h2>
 
             {/* Description */}
-            <p className="text-slate-600 dark:text-slate-300 mb-6">{project.description}</p>
+            <p className="text-text-secondary mb-6">{project.description}</p>
 
             {/* Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* Problem */}
               <div>
-                <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                <h3 className="text-sm font-semibold text-accent-purple uppercase tracking-wider mb-2">
                   Problem
                 </h3>
-                <p className="text-slate-700 dark:text-slate-300">{project.problem}</p>
+                <p className="text-text-secondary">{project.problem}</p>
               </div>
 
               {/* Role */}
               <div>
-                <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                <h3 className="text-sm font-semibold text-accent-purple uppercase tracking-wider mb-2">
                   My Role
                 </h3>
-                <p className="text-slate-700 dark:text-slate-300">{project.role}</p>
+                <p className="text-text-secondary">{project.role}</p>
               </div>
 
               {/* Outcome */}
               <div>
-                <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                <h3 className="text-sm font-semibold text-accent-purple uppercase tracking-wider mb-2">
                   Outcome
                 </h3>
-                <p className="text-slate-700 dark:text-slate-300">{project.outcome}</p>
+                <p className="text-text-secondary">{project.outcome}</p>
               </div>
 
               {/* Stack */}
               <div>
-                <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+                <h3 className="text-sm font-semibold text-accent-purple uppercase tracking-wider mb-2">
                   Stack
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {project.stack.map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-2 py-1 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded"
-                    >
-                      {tech}
-                    </span>
+                    <Tag key={tech} variant="outlined">{tech}</Tag>
                   ))}
                 </div>
               </div>
             </div>
 
             {/* Links */}
-            <div className="flex gap-4 pt-6 border-t border-slate-200 dark:border-slate-800">
+            <div className="flex gap-4 pt-6 border-t border-border-subtle/20">
               {project.links.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-blue-600 dark:text-blue-400 hover:underline focus-visible-ring rounded px-2 py-1"
+                  className="text-accent-cyan hover:text-text-primary focus-visible-ring rounded px-2 py-1 transition-colors"
                 >
                   {link.label} →
                 </a>
               ))}
             </div>
-          </article>
+          </Card>
         ))}
       </div>
-    </div>
+    </PageContainer>
   )
 }
