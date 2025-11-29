@@ -27,19 +27,12 @@ var (
 		Use:   "api",
 		Short: "sochoa.dev API - personal website backend",
 		Long:  "sochoa.dev API is a REST API for a personal website with blog, guestbook, and analytics",
-	}
-
-	serveCmd = &cobra.Command{
-		Use:   "serve",
-		Short: "Start the API server",
-		Long:  "Start the Gin-based API server",
 		RunE:  serve,
 	}
 )
 
 func init() {
-	rootCmd.AddCommand(serveCmd)
-	serveCmd.Flags().StringVar(&port, "port", "8080", "Port to listen on")
+	rootCmd.Flags().StringVar(&port, "port", "8080", "Port to listen on")
 }
 
 func serve(_ *cobra.Command, _ []string) error {
