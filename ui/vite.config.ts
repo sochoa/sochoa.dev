@@ -7,7 +7,10 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        // Use environment variable for API URL (supports Docker and local dev)
+        // In docker-compose: http://api:8080 (service name)
+        // In local dev: http://localhost:8080
+        target: process.env.VITE_API_URL || 'http://localhost:8080',
         changeOrigin: true,
       },
     },
