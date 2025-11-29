@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -19,14 +20,25 @@ type Config struct {
 
 // Load loads configuration from environment variables with validation
 func Load() (*Config, error) {
+	dbDsn := getEnv("DB_DSN", "")
+
+	// If DB_DSN not provided, default to SQLite in ~/.cache
+	if dbDsn == "" {
+		var err error
+		dbDsn, err = getDefaultSQLitePath()
+		if err != nil {
+			return nil, fmt.Errorf("failed to create default database path: %w", err)
+		}
+	}
+
 	cfg := &Config{
-		DBDsn:             getEnv("DB_DSN", ""),
+		DBDsn:             dbDsn,
 		AWSRegion:         getEnv("AWS_REGION", "us-east-1"),
 		CognitoUserPoolID: getEnv("COGNITO_USER_POOL_ID", ""),
 		CognitoClientID:   getEnv("COGNITO_CLIENT_ID", ""),
-		LogLevel:          getEnv("LOG_LEVEL", "info"),
-		DevMode:           getEnvBool("DEV_MODE", false),
-		DevUserRole:       getEnv("DEV_USER_ROLE", "user"),
+		LogLevel:          getEnv("LOG_LEVEL", "debug"),
+		DevMode:           getEnvBool("DEV_MODE", true),
+		DevUserRole:       getEnv("DEV_USER_ROLE", "admin"),
 	}
 
 	// Validate required fields
@@ -39,10 +51,6 @@ func Load() (*Config, error) {
 
 // Validate checks that required configuration values are present
 func (c *Config) Validate() error {
-	if c.DBDsn == "" {
-		return fmt.Errorf("DB_DSN environment variable is required")
-	}
-
 	if c.AWSRegion == "" {
 		return fmt.Errorf("AWS_REGION environment variable is required")
 	}
@@ -101,4 +109,21 @@ func getEnvBool(key string, defaultVal bool) bool {
 		return defaultVal
 	}
 	return boolVal
+}
+
+// getDefaultSQLitePath creates and returns a default SQLite database path in ~/.cache
+func getDefaultSQLitePath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	cacheDir := filepath.Join(home, ".cache", "sochoa.dev")
+	if err := os.MkdirAll(cacheDir, 0700); err != nil {
+		return "", fmt.Errorf("failed to create cache directory: %w", err)
+	}
+
+	dbPath := filepath.Join(cacheDir, "api.db")
+	dsn := "file:" + dbPath + "?cache=shared&mode=rwc"
+	return dsn, nil
 }
