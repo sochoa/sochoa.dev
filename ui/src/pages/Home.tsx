@@ -11,12 +11,18 @@ export default function Home() {
         <p className="text-xl text-slate-600 dark:text-slate-300 mb-6">
           Software engineer, writer, and builder. I create things that matter.
         </p>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <Link
             to="/blog"
             className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus-visible-ring"
           >
             Read Blog
+          </Link>
+          <Link
+            to="/guestbook"
+            className="inline-block px-6 py-3 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 focus-visible-ring"
+          >
+            Sign Guestbook
           </Link>
           <Link
             to="/contact"
