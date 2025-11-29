@@ -1,6 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
-import ThemeSelector from './ThemeSelector'
 
 export default function Header() {
   const user = useAuthStore((s) => s.user)
@@ -51,11 +50,6 @@ export default function Header() {
           <Link to="/contact" className={navLinkClass('/contact')}>
             Contact
           </Link>
-
-          {/* Theme & Palette Selector */}
-          <div className="pl-3 border-l border-border-subtle/30">
-            <ThemeSelector />
-          </div>
 
           {/* User Menu */}
           {user ? (
