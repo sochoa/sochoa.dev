@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
 	"time"
 
-	_ "github.com/lib/pq" // PostgreSQL driver
+	_ "github.com/lib/pq"              // PostgreSQL driver
+	_ "github.com/mattn/go-sqlite3"    // SQLite driver
 )
 
 // QueryExecutor interface for mocking database queries
@@ -16,30 +18,45 @@ type QueryExecutor interface {
 	ExecContext(ctx context.Context, query string, args ...interface{}) (sql.Result, error)
 }
 
-// Connection represents a PostgreSQL database connection pool
+// Connection represents a database connection pool (PostgreSQL or SQLite)
 type Connection struct {
-	db *sql.DB
+	db     *sql.DB
+	driver string
 }
 
-// Connect establishes a PostgreSQL connection pool
+// Connect establishes a database connection pool (PostgreSQL or SQLite)
 func Connect(ctx context.Context, dsn string) (*Connection, error) {
-	db, err := sql.Open("postgres", dsn)
+	var driver string
+
+	// Determine driver based on DSN format
+	if strings.HasPrefix(dsn, "file:") {
+		driver = "sqlite3"
+	} else {
+		driver = "postgres"
+	}
+
+	db, err := sql.Open(driver, dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
-	// Configure connection pool
-	db.SetMaxOpenConns(25)
-	db.SetMaxIdleConns(5)
-	db.SetConnMaxLifetime(5 * time.Minute)
-	db.SetConnMaxIdleTime(10 * time.Minute)
+	// Configure connection pool (SQLite handles differently)
+	if driver == "sqlite3" {
+		db.SetMaxOpenConns(1)
+		db.SetMaxIdleConns(0)
+	} else {
+		db.SetMaxOpenConns(25)
+		db.SetMaxIdleConns(5)
+		db.SetConnMaxLifetime(5 * time.Minute)
+		db.SetConnMaxIdleTime(10 * time.Minute)
+	}
 
 	// Test the connection
 	if err := db.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	return &Connection{db: db}, nil
+	return &Connection{db: db, driver: driver}, nil
 }
 
 // QueryRowContext executes a query that returns at most one row
