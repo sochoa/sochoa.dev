@@ -152,31 +152,31 @@ export default function Guestbook() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-      <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+      <h1 className="text-4xl font-bold text-text-primary mb-4">
         Guestbook
       </h1>
-      <p className="text-xl text-slate-600 dark:text-slate-300 mb-12">
+      <p className="text-lg text-text-secondary mb-12">
         Sign the guestbook and leave a message!
       </p>
 
       {/* Submit Form */}
       {token && user ? (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6 mb-12">
-          <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6">
+        <div className="bg-secondary border border-border-subtle rounded p-6 mb-12 shadow-subtle">
+          <h2 className="text-2xl font-semibold text-text-primary mb-6">
             Leave a Message
           </h2>
 
           {formState.submitted && (
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
-              <p className="text-green-800 dark:text-green-200">
-                ✓ Thanks for signing the guestbook! Your entry is pending approval.
+            <div className="bg-tertiary border border-border-accent rounded p-4 mb-6">
+              <p className="text-accent-teal">
+                [OK] Thanks for signing the guestbook! Your entry is pending approval.
               </p>
             </div>
           )}
 
           {formState.error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-              <p className="text-red-800 dark:text-red-200">
+            <div className="bg-tertiary border border-accent-magenta rounded p-4 mb-6">
+              <p className="text-accent-magenta">
                 Error: {formState.error}
               </p>
             </div>
@@ -185,7 +185,7 @@ export default function Guestbook() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Display Name */}
             <div>
-              <label htmlFor="displayName" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+              <label htmlFor="displayName" className="block text-sm font-medium text-text-primary mb-2">
                 Display Name
               </label>
               <input
@@ -196,14 +196,14 @@ export default function Guestbook() {
                 onChange={handleChange}
                 disabled={formState.isSubmitting}
                 placeholder="Your name"
-                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus-visible-ring disabled:opacity-50"
+                className="w-full px-4 py-2 border border-border-subtle bg-tertiary text-text-primary rounded focus-visible-ring disabled:opacity-50 disabled:cursor-not-allowed hover:border-border-accent transition-colors"
                 aria-invalid={!!formState.errors.displayName}
                 aria-describedby={
                   formState.errors.displayName ? 'displayName-error' : undefined
                 }
               />
               {formState.errors.displayName && (
-                <p id="displayName-error" className="text-red-600 dark:text-red-400 text-sm mt-2">
+                <p id="displayName-error" className="text-accent-magenta text-sm mt-2">
                   {formState.errors.displayName}
                 </p>
               )}
@@ -211,7 +211,7 @@ export default function Guestbook() {
 
             {/* Message */}
             <div>
-              <label htmlFor="message" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+              <label htmlFor="message" className="block text-sm font-medium text-text-primary mb-2">
                 Message
               </label>
               <textarea
@@ -222,18 +222,18 @@ export default function Guestbook() {
                 disabled={formState.isSubmitting}
                 placeholder="Leave your message..."
                 rows={4}
-                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus-visible-ring disabled:opacity-50 resize-none"
+                className="w-full px-4 py-2 border border-border-subtle bg-tertiary text-text-primary rounded focus-visible-ring disabled:opacity-50 disabled:cursor-not-allowed hover:border-border-accent transition-colors resize-none"
                 aria-invalid={!!formState.errors.message}
                 aria-describedby={
                   formState.errors.message ? 'message-error' : undefined
                 }
               />
               {formState.errors.message && (
-                <p id="message-error" className="text-red-600 dark:text-red-400 text-sm mt-2">
+                <p id="message-error" className="text-accent-magenta text-sm mt-2">
                   {formState.errors.message}
                 </p>
               )}
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+              <p className="text-xs text-text-tertiary mt-2">
                 {formState.data.message.length} / 500
               </p>
             </div>
@@ -254,16 +254,16 @@ export default function Guestbook() {
             <button
               type="submit"
               disabled={formState.isSubmitting}
-              className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed focus-visible-ring font-medium transition-colors"
+              className="w-full px-6 py-3 bg-accent-cyan text-primary font-medium rounded border border-accent-cyan hover:bg-transparent hover:text-accent-cyan disabled:opacity-50 disabled:cursor-not-allowed focus-visible-ring transition-all"
             >
               {formState.isSubmitting ? 'Submitting...' : 'Sign Guestbook'}
             </button>
           </form>
         </div>
       ) : (
-        <div className="bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg p-6 mb-12">
-          <p className="text-slate-700 dark:text-slate-300">
-            <a href="/login" className="text-blue-600 dark:text-blue-400 hover:underline">
+        <div className="bg-secondary border border-border-subtle rounded p-6 mb-12 shadow-subtle">
+          <p className="text-text-secondary">
+            <a href="/login" className="text-accent-cyan hover:text-accent-teal">
               Sign in
             </a>
             {' '}to leave a message in the guestbook.
@@ -273,25 +273,25 @@ export default function Guestbook() {
 
       {/* Entries List */}
       <div>
-        <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-6">
+        <h2 className="text-2xl font-semibold text-text-primary mb-6">
           Recent Entries
         </h2>
 
         {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-            <p className="text-red-800 dark:text-red-200">Error: {error}</p>
+          <div className="bg-secondary border border-accent-magenta rounded p-4 mb-6 shadow-subtle">
+            <p className="text-accent-magenta">Error: {error}</p>
           </div>
         )}
 
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-slate-600 dark:text-slate-300">
+            <p className="text-text-secondary">
               Loading entries...
             </p>
           </div>
         ) : entries.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-slate-600 dark:text-slate-300">
+            <p className="text-text-secondary">
               No entries yet. Be the first to sign!
             </p>
           </div>
@@ -300,13 +300,13 @@ export default function Guestbook() {
             {entries.map((entry) => (
               <div
                 key={entry.id}
-                className="border border-slate-200 dark:border-slate-800 rounded-lg p-6"
+                className="border border-border-subtle bg-secondary rounded p-6 shadow-subtle hover:border-border-accent transition-colors"
               >
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                  <h3 className="font-semibold text-text-primary">
                     {entry.displayName}
                   </h3>
-                  <time className="text-sm text-slate-500 dark:text-slate-400">
+                  <time className="text-xs text-text-tertiary">
                     {new Date(entry.createdAt).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'short',
@@ -314,7 +314,7 @@ export default function Guestbook() {
                     })}
                   </time>
                 </div>
-                <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+                <p className="text-text-secondary whitespace-pre-wrap">
                   {entry.message}
                 </p>
               </div>

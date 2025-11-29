@@ -4,35 +4,35 @@ export default function Home() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       {/* Hero Section */}
-      <section className="mb-16">
-        <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+      <section className="mb-20">
+        <h1 className="text-5xl sm:text-6xl font-bold text-text-primary mb-4 leading-tight">
           Hey, I'm sochoa
         </h1>
-        <p className="text-xl text-slate-600 dark:text-slate-300 mb-6">
+        <p className="text-lg text-text-secondary mb-8 max-w-2xl leading-relaxed">
           Software engineer, writer, and builder. I create things that matter.
         </p>
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-3">
           <Link
             to="/about"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus-visible-ring"
+            className="inline-block px-6 py-2 bg-accent-cyan text-primary font-medium rounded border border-accent-cyan hover:bg-transparent hover:text-accent-cyan focus-visible-ring transition-all"
           >
             About Me
           </Link>
           <Link
             to="/work"
-            className="inline-block px-6 py-3 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 focus-visible-ring"
+            className="inline-block px-6 py-2 border border-border-subtle text-text-primary rounded hover:border-border-accent hover:text-accent-cyan focus-visible-ring transition-colors"
           >
             View Work
           </Link>
           <Link
             to="/blog"
-            className="inline-block px-6 py-3 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 focus-visible-ring"
+            className="inline-block px-6 py-2 border border-border-subtle text-text-primary rounded hover:border-border-accent hover:text-accent-cyan focus-visible-ring transition-colors"
           >
             Read Blog
           </Link>
           <Link
             to="/contact"
-            className="inline-block px-6 py-3 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900 focus-visible-ring"
+            className="inline-block px-6 py-2 border border-border-subtle text-text-primary rounded hover:border-border-accent hover:text-accent-cyan focus-visible-ring transition-colors"
           >
             Get in Touch
           </Link>
@@ -40,14 +40,14 @@ export default function Home() {
       </section>
 
       {/* Featured Work */}
-      <section className="mb-16">
+      <section className="mb-20">
         <div className="flex justify-between items-baseline mb-8">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <h2 className="text-2xl font-bold text-text-primary">
             Featured Work
           </h2>
           <Link
             to="/work"
-            className="text-blue-600 dark:text-blue-400 hover:underline focus-visible-ring rounded"
+            className="text-accent-cyan hover:text-accent-teal focus-visible-ring rounded text-sm transition-colors"
           >
             View all →
           </Link>
@@ -56,17 +56,17 @@ export default function Home() {
           {[1, 2].map((item) => (
             <div
               key={item}
-              className="border border-slate-200 dark:border-slate-800 rounded-lg p-6 hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+              className="border border-border-subtle bg-secondary rounded p-6 hover:border-border-accent hover:shadow-subtle-lg transition-all"
             >
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-text-primary mb-3">
                 Project {item}
               </h3>
-              <p className="text-slate-600 dark:text-slate-300 mb-4">
+              <p className="text-text-secondary mb-4 text-sm">
                 Description of the project and the impact it made.
               </p>
               <a
                 href="#"
-                className="text-blue-600 dark:text-blue-400 hover:underline focus-visible-ring rounded"
+                className="text-accent-cyan hover:text-accent-teal focus-visible-ring rounded text-sm transition-colors inline-block"
               >
                 Learn more →
               </a>
@@ -77,25 +77,25 @@ export default function Home() {
 
       {/* Latest Posts */}
       <section>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">
+        <h2 className="text-2xl font-bold text-text-primary mb-8">
           Latest Posts
         </h2>
         <div className="space-y-6">
           {[1, 2, 3].map((item) => (
             <article
               key={item}
-              className="border-b border-slate-200 dark:border-slate-800 pb-6"
+              className="pb-6 border-b border-border-subtle last:border-b-0"
             >
               <Link
                 to={`/blog/post-${item}`}
-                className="text-lg font-semibold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 focus-visible-ring rounded"
+                className="text-lg font-semibold text-text-primary hover:text-accent-cyan focus-visible-ring rounded transition-colors"
               >
                 Blog Post Title {item}
               </Link>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+              <p className="text-xs text-text-tertiary mt-2">
                 December {item}, 2024
               </p>
-              <p className="text-slate-600 dark:text-slate-300 mt-3">
+              <p className="text-text-secondary mt-3 text-sm">
                 A brief excerpt of the blog post to entice readers...
               </p>
             </article>
@@ -103,7 +103,7 @@ export default function Home() {
         </div>
         <Link
           to="/blog"
-          className="inline-block mt-8 text-blue-600 dark:text-blue-400 hover:underline focus-visible-ring rounded"
+          className="inline-block mt-8 text-accent-cyan hover:text-accent-teal focus-visible-ring rounded text-sm transition-colors"
         >
           View all posts →
         </Link>

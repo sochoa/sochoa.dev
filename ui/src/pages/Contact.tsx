@@ -106,31 +106,31 @@ export default function Contact() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-      <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+      <h1 className="text-4xl font-bold text-text-primary mb-4">
         Get in Touch
       </h1>
-      <p className="text-xl text-slate-600 dark:text-slate-300 mb-12">
+      <p className="text-lg text-text-secondary mb-12">
         Have a question or want to work together? Send me a message.
       </p>
 
       {state.submitted && (
-        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 mb-8">
-          <p className="text-green-800 dark:text-green-200">
-            ✓ Thank you! I'll get back to you soon.
+        <div className="bg-secondary border border-border-accent rounded p-6 mb-8 shadow-subtle">
+          <p className="text-accent-teal">
+            [OK] Thank you! I'll get back to you soon.
           </p>
         </div>
       )}
 
       {state.error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-8">
-          <p className="text-red-800 dark:text-red-200">Error: {state.error}</p>
+        <div className="bg-secondary border border-accent-magenta rounded p-6 mb-8 shadow-subtle">
+          <p className="text-accent-magenta">Error: {state.error}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Name */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+          <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-2">
             Name
           </label>
           <input
@@ -140,12 +140,12 @@ export default function Contact() {
             value={state.data.name}
             onChange={handleChange}
             disabled={state.isSubmitting}
-            className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus-visible-ring disabled:opacity-50"
+            className="w-full px-4 py-2 border border-border-subtle bg-secondary text-text-primary rounded focus-visible-ring disabled:opacity-50 disabled:cursor-not-allowed hover:border-border-accent transition-colors"
             aria-invalid={!!state.errors.name}
             aria-describedby={state.errors.name ? 'name-error' : undefined}
           />
           {state.errors.name && (
-            <p id="name-error" className="text-red-600 dark:text-red-400 text-sm mt-2">
+            <p id="name-error" className="text-accent-magenta text-sm mt-2">
               {state.errors.name}
             </p>
           )}
@@ -153,7 +153,7 @@ export default function Contact() {
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+          <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
             Email
           </label>
           <input
@@ -163,12 +163,12 @@ export default function Contact() {
             value={state.data.email}
             onChange={handleChange}
             disabled={state.isSubmitting}
-            className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus-visible-ring disabled:opacity-50"
+            className="w-full px-4 py-2 border border-border-subtle bg-secondary text-text-primary rounded focus-visible-ring disabled:opacity-50 disabled:cursor-not-allowed hover:border-border-accent transition-colors"
             aria-invalid={!!state.errors.email}
             aria-describedby={state.errors.email ? 'email-error' : undefined}
           />
           {state.errors.email && (
-            <p id="email-error" className="text-red-600 dark:text-red-400 text-sm mt-2">
+            <p id="email-error" className="text-accent-magenta text-sm mt-2">
               {state.errors.email}
             </p>
           )}
@@ -176,7 +176,7 @@ export default function Contact() {
 
         {/* Message */}
         <div>
-          <label htmlFor="message" className="block text-sm font-medium text-slate-900 dark:text-white mb-2">
+          <label htmlFor="message" className="block text-sm font-medium text-text-primary mb-2">
             Message
           </label>
           <textarea
@@ -186,16 +186,16 @@ export default function Contact() {
             onChange={handleChange}
             disabled={state.isSubmitting}
             rows={6}
-            className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus-visible-ring disabled:opacity-50 resize-none"
+            className="w-full px-4 py-2 border border-border-subtle bg-secondary text-text-primary rounded focus-visible-ring disabled:opacity-50 disabled:cursor-not-allowed hover:border-border-accent transition-colors resize-none"
             aria-invalid={!!state.errors.message}
             aria-describedby={state.errors.message ? 'message-error' : undefined}
           />
           {state.errors.message && (
-            <p id="message-error" className="text-red-600 dark:text-red-400 text-sm mt-2">
+            <p id="message-error" className="text-accent-magenta text-sm mt-2">
               {state.errors.message}
             </p>
           )}
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+          <p className="text-xs text-text-tertiary mt-2">
             {state.data.message.length} / 5000
           </p>
         </div>
@@ -204,7 +204,7 @@ export default function Contact() {
         <button
           type="submit"
           disabled={state.isSubmitting}
-          className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed focus-visible-ring font-medium transition-colors"
+          className="w-full px-6 py-3 bg-accent-cyan text-primary font-medium rounded border border-accent-cyan hover:bg-transparent hover:text-accent-cyan disabled:opacity-50 disabled:cursor-not-allowed focus-visible-ring transition-all"
         >
           {state.isSubmitting ? 'Sending...' : 'Send Message'}
         </button>

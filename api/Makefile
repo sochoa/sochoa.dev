@@ -6,6 +6,9 @@ BINARY_LINUX=$(BINARY_NAME)_linux
 MAIN_PATH=./main.go
 COVERAGE_FILE=coverage.out
 COVERAGE_HTML=coverage.html
+VERSION?=dev
+LDFLAGS=-ldflags="-s -w -X main.Version=$(VERSION)"
+BUILD_FLAGS=-trimpath $(LDFLAGS)
 
 # Colors for output
 RED=\033[0;31m
@@ -32,11 +35,13 @@ help:
 # Build targets
 build: mocks
 	@echo "$(YELLOW)Building $(BINARY_NAME)...$(NC)"
-	go build -o ../bin/$(BINARY_NAME) .
+	go build $(BUILD_FLAGS) -o ../bin/$(BINARY_NAME) .
+	@SIZE=$$(ls -lh ../bin/$(BINARY_NAME) | awk '{print $$5}'); echo "$(GREEN)✓ Build complete: $$SIZE$(NC)"
 
 build-lambda: mocks
 	@echo "$(YELLOW)Building for Lambda (Linux ARM64)...$(NC)"
-	GOOS=linux GOARCH=arm64 go build -o ../bin/$(BINARY_LINUX) .
+	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o ../bin/$(BINARY_LINUX) .
+	@SIZE=$$(ls -lh ../bin/$(BINARY_LINUX) | awk '{print $$5}'); echo "$(GREEN)✓ Lambda build complete: $$SIZE$(NC)"
 
 # Mock generation
 mocks:

@@ -7,27 +7,74 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        mono: [
+          'ui-monospace',
+          'SFMono-Regular',
+          'Menlo',
+          'Monaco',
+          'Consolas',
+          '"Liberation Mono"',
+          '"Courier New"',
+          'monospace',
+        ],
+      },
       colors: {
-        primary: '#0f172a',
-        secondary: '#1e293b',
-        accent: '#3b82f6',
+        primary: '#0a0e27',
+        secondary: '#1a1f3a',
+        tertiary: '#242d47',
+        accent: {
+          cyan: '#00d9ff',
+          teal: '#00ffd1',
+          magenta: '#ff006e',
+        },
+        text: {
+          primary: '#e8ecf1',
+          secondary: '#8892a6',
+          tertiary: '#5a6578',
+        },
+        border: {
+          subtle: '#2d3748',
+          accent: '#00d9ff',
+        },
+      },
+      borderRadius: {
+        none: '0',
+        sm: '2px',
+        DEFAULT: '4px',
+        md: '6px',
+        lg: '8px',
       },
       typography: {
         DEFAULT: {
           css: {
-            color: 'rgb(51 65 85 / var(--tw-text-opacity))',
+            color: '#e8ecf1',
+            backgroundColor: 'transparent',
             'h1, h2, h3, h4, h5, h6': {
-              color: 'rgb(15 23 42 / var(--tw-text-opacity))',
+              color: '#e8ecf1',
+              fontFamily:
+                'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
             },
             'a': {
-              color: 'rgb(59 130 246 / var(--tw-text-opacity))',
+              color: '#00d9ff',
               '&:hover': {
-                color: 'rgb(37 99 235 / var(--tw-text-opacity))',
+                color: '#00ffd1',
               },
             },
             'code': {
-              color: 'rgb(55 65 81 / var(--tw-text-opacity))',
-              backgroundColor: 'rgb(243 244 246 / var(--tw-bg-opacity))',
+              color: '#00d9ff',
+              backgroundColor: '#1a1f3a',
+              padding: '2px 6px',
+              borderRadius: '4px',
+            },
+            'pre': {
+              backgroundColor: '#1a1f3a',
+              color: '#e8ecf1',
+              borderRadius: '4px',
+            },
+            'blockquote': {
+              color: '#8892a6',
+              borderLeftColor: '#00d9ff',
             },
           },
         },

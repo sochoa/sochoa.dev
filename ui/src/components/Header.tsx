@@ -8,12 +8,12 @@ export default function Header() {
   const logout = useAuthStore((s) => s.logout)
 
   return (
-    <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950">
+    <header className="border-b border-border-subtle bg-primary">
       <nav className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link
           to="/"
-          className="text-xl font-bold text-slate-900 dark:text-white focus-visible-ring rounded"
+          className="text-lg font-bold text-text-primary hover-text-accent focus-visible-ring rounded px-2 py-1"
         >
           sochoa.dev
         </Link>
@@ -22,50 +22,48 @@ export default function Header() {
         <div className="flex items-center gap-6">
           <Link
             to="/"
-            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1"
+            className="text-text-secondary hover-text-accent focus-visible-ring rounded px-2 py-1 text-sm"
           >
             Home
           </Link>
           <Link
             to="/about"
-            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1"
+            className="text-text-secondary hover-text-accent focus-visible-ring rounded px-2 py-1 text-sm"
           >
             About
           </Link>
           <Link
             to="/work"
-            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1"
+            className="text-text-secondary hover-text-accent focus-visible-ring rounded px-2 py-1 text-sm"
           >
             Work
           </Link>
           <Link
             to="/blog"
-            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1"
+            className="text-text-secondary hover-text-accent focus-visible-ring rounded px-2 py-1 text-sm"
           >
             Blog
           </Link>
           <Link
             to="/guestbook"
-            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1"
+            className="text-text-secondary hover-text-accent focus-visible-ring rounded px-2 py-1 text-sm"
           >
             Guestbook
           </Link>
           <Link
             to="/contact"
-            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1"
+            className="text-text-secondary hover-text-accent focus-visible-ring rounded px-2 py-1 text-sm"
           >
             Contact
           </Link>
 
           {/* User Menu */}
           {user ? (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-slate-600 dark:text-slate-300">
-                {user.email}
-              </span>
+            <div className="flex items-center gap-2 pl-4 border-l border-border-subtle">
+              <span className="text-xs text-text-secondary">{user.email}</span>
               <button
                 onClick={logout}
-                className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1 text-sm"
+                className="text-text-secondary hover-text-accent focus-visible-ring rounded px-2 py-1 text-xs"
               >
                 Sign out
               </button>
@@ -73,19 +71,19 @@ export default function Header() {
           ) : (
             <Link
               to="/login"
-              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible-ring rounded px-2 py-1 text-sm"
+              className="text-text-secondary hover-text-accent focus-visible-ring rounded px-2 py-1 text-xs"
             >
               Sign in
             </Link>
           )}
 
-          {/* Theme Toggle */}
+          {/* Theme Toggle - text instead of emoji */}
           <button
             onClick={toggle}
-            className="p-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-50 focus-visible-ring"
+            className="ml-2 px-3 py-1 text-xs text-text-secondary bg-secondary rounded border border-border-subtle hover:border-border-accent hover:text-accent-cyan focus-visible-ring transition-colors"
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
-            {isDark ? '☀️' : '🌙'}
+            [{isDark ? 'light' : 'dark'}]
           </button>
         </div>
       </nav>

@@ -4,15 +4,36 @@
 
 @layer base {
   :root {
-    color-scheme: light dark;
+    color-scheme: dark;
+  }
+
+  * {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      'Liberation Mono', 'Courier New', monospace;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: #0a0e27;
+    color: #e8ecf1;
   }
 
   body {
-    @apply bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-50;
+    @apply bg-primary text-text-primary;
   }
 
   a {
-    @apply text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300;
+    @apply text-accent-cyan hover:text-accent-teal transition-colors;
+  }
+
+  button {
+    @apply transition-all duration-200;
+  }
+
+  input,
+  textarea,
+  select {
+    font-family: inherit;
   }
 }
 
@@ -21,9 +42,32 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Focus styles for accessibility */
+/* Focus styles for accessibility - subtle glow on dark background */
 @layer utilities {
   .focus-visible-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-950;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-primary;
+  }
+
+  /* Subtle shadow for depth */
+  .shadow-subtle {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .shadow-subtle-lg {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Hover state utilities */
+  .hover-lift {
+    @apply hover:shadow-subtle-lg hover:-translate-y-0.5 transition-all duration-200;
+  }
+
+  .hover-text-accent {
+    @apply hover:text-accent-cyan transition-colors duration-200;
+  }
+
+  /* Border accent on hover */
+  .hover-border-accent {
+    @apply border border-border-subtle hover:border-border-accent transition-colors duration-200;
   }
 }

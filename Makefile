@@ -55,14 +55,14 @@ setup:
 	@echo "Run 'make api' to start the API"
 
 api:
-	@cd $(API_DIR) && go build -o api ./ && DEV_MODE=true DEV_USER_ROLE=admin LOG_LEVEL=debug ./api
+	@cd $(API_DIR) && make build && DEV_MODE=true DEV_USER_ROLE=admin LOG_LEVEL=debug ../bin/api
 
 api-dev:
 	@which air > /dev/null || (echo "Installing air..." && go install github.com/cosmtrek/air@latest)
 	@cd $(API_DIR) && DEV_MODE=true DEV_USER_ROLE=admin LOG_LEVEL=debug air
 
 api-build:
-	@cd $(API_DIR) && go build -o api ./
+	@cd $(API_DIR) && make build
 
 api-test:
 	@cd $(API_DIR) && go test ./...
@@ -100,7 +100,7 @@ ui-build:
 
 full-dev:
 	@echo "🚀 Starting API (8080) and UI (5173)..."
-	@cd $(API_DIR) && go build -o api ./ && DEV_MODE=true DEV_USER_ROLE=admin LOG_LEVEL=debug ./api & \
+	@cd $(API_DIR) && make build && DEV_MODE=true DEV_USER_ROLE=admin LOG_LEVEL=debug ../bin/api & \
 	cd $(UI_DIR) && npm run dev
 
 colima-start:
